@@ -13,7 +13,10 @@ export default async function handler(req, res) {
   }
 
   const upstashUrl = process.env.UPSTASH_REDIS_REST_URL || 'https://touching-joey-224063.upstash.io';
-  const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN || 'AZ9_AAIncDEyODhhNTk2OGUyODA0ZjM3YWM1NDk3ZDlkNmY2NTMyZXAxMjI0MDYz';
+  const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!upstashToken) {
+    return res.status(200).json({ views: 1 });
+  }
 
   try {
     const response = await fetch(`${upstashUrl}/incr/views:${encodeURIComponent(episodeId)}`, {

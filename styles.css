@@ -218,6 +218,28 @@ body {
     text-align: center;
     box-shadow: 0 16px 40px rgba(0,0,0,0.5);
 }
+.continue-card {
+    min-width: 180px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px;
+    cursor: pointer;
+}
+.continue-bar { height: 4px; background: #27272a; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.continue-bar div { height: 100%; background: var(--primary-orange); }
+.continue-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.continue-pct { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.fav-btn {
+    position: absolute; top: 8px; right: 8px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 13px;
+}
+.fav-btn.active { background: var(--primary-orange); border-color: var(--primary-orange); }
+.comment-item { padding: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-dark); margin-bottom: 8px; }
+.comment-head { display: flex; align-items: center; gap: 8px; }
 
 /* Main Content Views */
 .main-content {

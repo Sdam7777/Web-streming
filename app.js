@@ -101,6 +101,8 @@ async function openAnimeDetail(id) {
 
 let hlsInstance=null;
 function getEpisodeUrls(ep){ return ep.urls && Array.isArray(ep.urls) && ep.urls.length ? ep.urls : [ep.url]; }
+function ensureHls(){ return new Promise(res=>{ if(window.Hls) return res(); const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js'; s.onload=()=>res(); document.head.appendChild(s); }); }
+function ensureWebTorrent(){ return new Promise(res=>{ if(window.WebTorrent) return res(); const s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/npm/webtorrent@1.9.7/webtorrent.min.js'; s.onload=()=>res(); document.head.appendChild(s); }); }
 function getQualityUrls(ep){
   const base = getEpisodeUrls(ep);
   // per-title 1080p bitrate rendah + HLS SVC master.m3u8
@@ -139,41 +141,48 @@ function playEpisode(ep) {
   if(posterBlur){ posterBlur.style.opacity='1'; posterBlur.src=selectedAnime?.poster||'cover.jpg'; }
   player.onplaying = ()=>{ if(posterBlur) posterBlur.style.opacity='0'; };
   player.onpause = ()=>{ if(posterBlur && player.currentTime<1) posterBlur.style.opacity='1'; };
-  // P2P WebTorrent prefetch for 1k: if WebTorrent available and torrent infoHash exists
-  if(window.WebTorrent && ep.torrent){
-    try{
-      const client=new WebTorrent();
-      client.add(ep.torrent, torrent=>{
-        const file=torrent.files.find(f=>f.name===ep.name) || torrent.files[0];
-        file.renderTo(player, {autoplay:true});
-        document.getElementById('networkInfo').textContent+=' • P2P';
-      });
-    }catch(e){}
+  // P2P WebTorrent lazy - hemat 200KB dashboard, load on demand 1k
+  if(ep.torrent){
+    ensureWebTorrent().then(()=>{
+      try{
+        const client=new WebTorrent();
+        client.add(ep.torrent, torrent=>{
+          const file=torrent.files.find(f=>f.name===ep.name) || torrent.files[0];
+          file.renderTo(player, {autoplay:true});
+          document.getElementById('networkInfo').textContent+=' • P2P';
+        });
+      }catch(e){}
+    });
   }
-  // Use HLS SVC if available and url is m3u8
-  if(window.Hls && window.Hls.isSupported() && targetUrl.endsWith('.m3u8')){
-    // Try HLS first, fallback to base mkv if 404
-    fetch(targetUrl, {method:'HEAD'}).then(r=>{
-      if(r.ok){
-        if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} }
-        hlsInstance = new Hls({ capLevelToPlayerSize:true, maxBufferLength:30, maxMaxBufferLength:60 });
-        hlsInstance.loadSource(targetUrl);
-        hlsInstance.attachMedia(player);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, ()=> player.play().catch(()=>{}));
-        hlsInstance.on(Hls.Events.ERROR, (e, data)=>{
-          if(data.fatal){
-            if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); }
+  // HLS SVC lazy - hemat 150KB dashboard
+  if(targetUrl.endsWith('.m3u8')){
+    ensureHls().then(()=>{
+      if(window.Hls && window.Hls.isSupported()){
+        fetch(targetUrl, {method:'HEAD'}).then(r=>{
+          if(r.ok){
+            if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} }
+            hlsInstance = new Hls({ capLevelToPlayerSize:true, maxBufferLength:30, maxMaxBufferLength:60 });
+            hlsInstance.loadSource(targetUrl);
+            hlsInstance.attachMedia(player);
+            hlsInstance.on(Hls.Events.MANIFEST_PARSED, ()=> player.play().catch(()=>{}));
+            hlsInstance.on(Hls.Events.ERROR, (e, data)=>{
+              if(data.fatal){
+                if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); }
+              }
+            });
+          } else {
+            if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} hlsInstance=null; }
+            source.src = getEpisodeUrls(ep)[0];
+            player.load();
           }
+        }).catch(()=>{
+          source.src = getEpisodeUrls(ep)[0];
+          player.load();
         });
       } else {
-        // fallback to base mkv per-title 1080p bitrate rendah
-        if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} hlsInstance=null; }
-        source.src = getEpisodeUrls(ep)[0];
+        source.src = targetUrl;
         player.load();
       }
-    }).catch(()=>{
-      source.src = getEpisodeUrls(ep)[0];
-      player.load();
     });
   } else {
     if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} hlsInstance=null; }
@@ -280,28 +289,38 @@ function filterCatalog() {
   });
 }
 
-// Continue Watching
+// Continue Watching - cache 60s hemat server 1k
 async function loadContinueWatching(){
   const u=getUser(); const box=document.getElementById('continueBox');
   if(!box) return;
   if(!u){ box.style.display='none'; return; }
+  const cacheKey='tariaki_continue_'+u.uid;
+  const cached=sessionStorage.getItem(cacheKey);
+  if(cached){
+    try{ const {data, ts}=JSON.parse(cached); if(Date.now()-ts<60000 && Array.isArray(data) && data.length){ renderContinue(data); return; } }catch(e){}
+  }
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/watch_history?uid=eq.${u.uid}&order=updated_at.desc&limit=6`, {headers:{apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`}});
     const data=await r.json();
+    sessionStorage.setItem(cacheKey, JSON.stringify({data, ts:Date.now()}));
     if(!Array.isArray(data) || data.length===0){ box.style.display='none'; return; }
-    box.style.display='block';
-    const grid=document.getElementById('continueGrid');
-    grid.innerHTML='';
-    data.forEach(h=>{
-      const ep=getAllEpisFromCatalog(h.episode_name);
-      const pct=h.duration? Math.round((h.progress/h.duration)*100):0;
-      const div=document.createElement('div');
-      div.className='continue-card';
-      div.onclick=()=>{ const target=ep; if(target) { selectedAnime=catalog.find(c=>c.id===h.anime_id)||catalog[0]; playEpisode(target); } };
-      div.innerHTML=`<div class="continue-title">${h.episode_name}</div><div class="continue-bar"><div style="width:${pct}%"></div></div><div class="continue-pct">${pct}%</div>`;
-      grid.appendChild(div);
-    });
+    renderContinue(data);
   }catch(e){ box.style.display='none'; }
+}
+function renderContinue(data){
+  const box=document.getElementById('continueBox');
+  box.style.display='block';
+  const grid=document.getElementById('continueGrid');
+  grid.innerHTML='';
+  data.forEach(h=>{
+    const ep=getAllEpisFromCatalog(h.episode_name);
+    const pct=h.duration? Math.round((h.progress/h.duration)*100):0;
+    const div=document.createElement('div');
+    div.className='continue-card';
+    div.onclick=()=>{ const target=ep; if(target) { selectedAnime=catalog.find(c=>c.id===h.anime_id)||catalog[0]; playEpisode(target); } };
+    div.innerHTML=`<div class="continue-title">${h.episode_name}</div><div class="continue-bar"><div style="width:${pct}%"></div></div><div class="continue-pct">${pct}%</div>`;
+    grid.appendChild(div);
+  });
 }
 function getAllEpisFromCatalog(name){
   for(const a of catalog){ for(const c of a.categories){ for(const e of c.episodes){ if(e.name===name) return {...e, animeId:a.id}; }}}
@@ -337,7 +356,10 @@ function updateFavUI(){
 }
 async function loadFavorites(){
   const u=getUser(); if(!u) return;
-  try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/favorites?uid=eq.${u.uid}&select=anime_id`, {headers:{apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`}}); const data=await r.json(); if(Array.isArray(data)) localStorage.setItem('tariaki_favs', JSON.stringify(data.map(x=>x.anime_id))); updateFavUI(); }catch(e){}
+  const cacheKey='tariaki_favs_'+u.uid;
+  const cached=sessionStorage.getItem(cacheKey);
+  if(cached){ try{ const {data,ts}=JSON.parse(cached); if(Date.now()-ts<60000){ localStorage.setItem('tariaki_favs', JSON.stringify(data)); updateFavUI(); return; } }catch(e){} }
+  try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/favorites?uid=eq.${u.uid}&select=anime_id`, {headers:{apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`}}); const data=await r.json(); if(Array.isArray(data)){ const ids=data.map(x=>x.anime_id); localStorage.setItem('tariaki_favs', JSON.stringify(ids)); sessionStorage.setItem(cacheKey, JSON.stringify({data:ids, ts:Date.now()})); updateFavUI(); } }catch(e){}
 }
 
 // Comments

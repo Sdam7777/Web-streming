@@ -87,10 +87,11 @@ function openAnimeDetail(id) {
 let hlsInstance=null;
 function getEpisodeUrls(ep){ return ep.urls && Array.isArray(ep.urls) && ep.urls.length ? ep.urls : [ep.url]; }
 function getQualityUrls(ep){
-  // multi-quality: 1080p feel even on slow internet - upscale 480p to 1080p container
   const base = getEpisodeUrls(ep);
-  // For now all qualities point to same file (mock), but logic ready for real HLS m3u8
-  return { auto: base[0], '1080': base[0], '720': base[0], '480': base[0], hls: base[0].replace('.mkv','.m3u8') };
+  // per-title 1080p bitrate rendah + HLS SVC master.m3u8
+  const hlsUrl = base[0].replace('.mkv','/master.m3u8').replace('/videos/','/videos/').replace('github.com','supabase.co');
+  // Try HLS SVC if exists, else fallback
+  return { auto: hlsUrl, '1080': base[0], '720': base[0], '480': base[0], hls: hlsUrl, base: base[0] };
 }
 function playEpisode(ep) {
   selectedEpisode = ep;
@@ -118,17 +119,46 @@ function playEpisode(ep) {
     player.style.filter = 'contrast(1.05) saturate(1.08)';
   }
   document.getElementById('qualityBadge').textContent = (qualitySel==='auto' ? '1080p • Auto' : qualitySel+'p') + (isSlow && qualitySel==='auto' ? ' (hemat)' : '');
-  // Use HLS if available and url is m3u8
+  // Poster 1080p blur-up: show poster until video playing
+  const posterBlur=document.getElementById('videoPosterBlur');
+  if(posterBlur){ posterBlur.style.opacity='1'; posterBlur.src=selectedAnime?.poster||'cover.jpg'; }
+  player.onplaying = ()=>{ if(posterBlur) posterBlur.style.opacity='0'; };
+  player.onpause = ()=>{ if(posterBlur && player.currentTime<1) posterBlur.style.opacity='1'; };
+  // P2P WebTorrent prefetch for 1k: if WebTorrent available and torrent infoHash exists
+  if(window.WebTorrent && ep.torrent){
+    try{
+      const client=new WebTorrent();
+      client.add(ep.torrent, torrent=>{
+        const file=torrent.files.find(f=>f.name===ep.name) || torrent.files[0];
+        file.renderTo(player, {autoplay:true});
+        document.getElementById('networkInfo').textContent+=' • P2P';
+      });
+    }catch(e){}
+  }
+  // Use HLS SVC if available and url is m3u8
   if(window.Hls && window.Hls.isSupported() && targetUrl.endsWith('.m3u8')){
-    if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} }
-    hlsInstance = new Hls({ capLevelToPlayerSize:true, maxBufferLength:30 });
-    hlsInstance.loadSource(targetUrl);
-    hlsInstance.attachMedia(player);
-    hlsInstance.on(Hls.Events.MANIFEST_PARSED, ()=> player.play().catch(()=>{}));
-    hlsInstance.on(Hls.Events.ERROR, (e, data)=>{
-      if(data.fatal){
-        if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); }
+    // Try HLS first, fallback to base mkv if 404
+    fetch(targetUrl, {method:'HEAD'}).then(r=>{
+      if(r.ok){
+        if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} }
+        hlsInstance = new Hls({ capLevelToPlayerSize:true, maxBufferLength:30, maxMaxBufferLength:60 });
+        hlsInstance.loadSource(targetUrl);
+        hlsInstance.attachMedia(player);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, ()=> player.play().catch(()=>{}));
+        hlsInstance.on(Hls.Events.ERROR, (e, data)=>{
+          if(data.fatal){
+            if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); }
+          }
+        });
+      } else {
+        // fallback to base mkv per-title 1080p bitrate rendah
+        if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} hlsInstance=null; }
+        source.src = getEpisodeUrls(ep)[0];
+        player.load();
       }
+    }).catch(()=>{
+      source.src = getEpisodeUrls(ep)[0];
+      player.load();
     });
   } else {
     if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} hlsInstance=null; }
@@ -137,6 +167,7 @@ function playEpisode(ep) {
     player.onerror = () => {
       if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); player.play().catch(()=>{}); }
     };
+  };
   }
   const savedTime = localStorage.getItem(`tariaki_progress_${ep.name}`);
   if (savedTime) {

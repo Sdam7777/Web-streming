@@ -6,13 +6,15 @@ function getUser(){ try{ return JSON.parse(localStorage.getItem('tariaki_user')|
 
 document.addEventListener("DOMContentLoaded", () => {
   renderCatalog();
+  // load DB catalog efficient - panggil setelah render biar gak race, hemat kuota
+  if(typeof loadCatalogFromDB==='function') loadCatalogFromDB();
   document.getElementById("logoBtn").onclick = () => showCatalog();
   setupAutoResumeAndAutoNext();
   setupPlayerEnhancements();
   loadContinueWatching();
   loadFavorites();
   setupSearch();
-  if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js').catch(()=>{}); }
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js?v=20250830d').catch(()=>{}); }
 });
 
 function renderCatalog() {

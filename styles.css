@@ -196,6 +196,29 @@ body {
     border-color: var(--primary-orange);
 }
 
+/* Login Gate - wajib login */
+.login-gate {
+    position: fixed;
+    inset: 0;
+    background: rgba(9,9,11,0.96);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+.login-gate-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 32px 24px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+
 /* Main Content Views */
 .main-content {
     max-width: 1280px;

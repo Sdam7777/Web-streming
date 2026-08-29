@@ -47,6 +47,7 @@
             </div>
             <h2 style="font-weight:800;font-size:22px;margin-bottom:8px">Login</h2>
             <button id="gateLoginBtn" class="btn-login" style="margin-top:20px;justify-content:center;width:100%;background:#fff;color:#111;border:none;padding:12px;border-radius:12px;font-weight:700"><i class="fa-brands fa-google"></i> Lanjutkan dengan Google</button>
+            <button id="debugLoginBtn" class="btn-nav-ep" style="margin-top:10px;width:100%;justify-content:center;background:var(--bg-card);border:1px dashed var(--primary-orange);color:var(--primary-orange)"><i class="fa-solid fa-bug"></i> Masuk Debug (Muse Spark)</button>
             <p style="color:var(--text-muted);font-size:11px;margin-top:12px">Dengan masuk, kamu setuju melanjutkan nonton di tariaki.vercel.app</p>
         </div>
     </div>
@@ -304,7 +305,19 @@
         async function doLogin(){ try{ await signInWithPopup(auth, provider);}catch(e){alert('Login gagal: '+e.message);} }
         loginBtn.onclick = doLogin;
         if(gateLoginBtn) gateLoginBtn.onclick = doLogin;
-        logoutBtn.onclick = () => signOut(auth);
+        // debug toggle biar Muse bisa masuk liat keluh kesah lu tanpa Google
+        const debugBtn=document.getElementById('debugLoginBtn');
+        if(debugBtn) debugBtn.onclick = ()=>{
+            const fake={uid:'debug-muse-spark', email:'muse@spark.debug', displayName:'Muse Spark (Debug)'};
+            localStorage.setItem('tariaki_user', JSON.stringify(fake));
+            localStorage.setItem('tariaki_profile', JSON.stringify({uid:fake.uid, display_name:'Muse Spark', bio:'Debug', avatar_url:'poster.svg', avatar_type:'image'}));
+            loginGate.style.display='none';
+            const main=document.querySelector('.main-content'); if(main){ main.style.display='block'; main.classList.add('auth-ready'); }
+            document.body.style.overflow='';
+            loginBtn.style.display='none';
+            const ub=document.getElementById('userBox'); if(ub){ ub.style.display='flex'; ub.classList.remove('hidden'); document.getElementById('userName').textContent='Muse Spark (Debug)'; }
+        };
+        logoutBtn.onclick = () => { localStorage.removeItem('tariaki_user'); localStorage.removeItem('tariaki_profile'); signOut(auth); location.reload(); };
 
         profileAvatar.onchange = () => {
             const f = profileAvatar.files[0];

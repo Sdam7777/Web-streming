@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prison School Sub Indo - Streaming & Download</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fa-solid fa-film"></i>
+                <span>Prison Stream</span>
+            </div>
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Cari episode..." onkeyup="filterEpisodes()">
+            </div>
+            <div class="nav-links">
+                <span class="badge"><i class="fa-solid fa-bolt"></i> GitHub Hosted</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        <!-- Main Player Section -->
+        <section class="player-section">
+            <div class="video-container">
+                <video id="videoPlayer" controls preload="metadata">
+                    <source id="videoSource" src="" type="video/mp4">
+                    Browser Anda tidak mendukung pemutar video HTML5.
+                </video>
+            </div>
+            <div class="video-details">
+                <div class="video-header">
+                    <div>
+                        <h2 id="currentEpisodeTitle">Prison School - Episode 01</h2>
+                        <p class="subtitle" id="currentEpisodeSub">Format: MKV Subtitle Indonesia | Ukuran: 113.59 MB</p>
+                    </div>
+                    <div class="action-buttons">
+                        <a id="downloadBtn" href="#" class="btn btn-primary" download target="_blank">
+                            <i class="fa-solid fa-download"></i> Unduh Episode
+                        </a>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fa-solid fa-circle-info"></i> Sinopsis Anime</h3>
+                    <p>Hachimitsu Private Academy, institusi boarding school putri berasrama paling bergengsi di Tokyo, memutuskan untuk mengizinkan murid laki-laki masuk pertama kali dalam sejarah sekolah tersebut. Lima anak laki-laki diterima, tetapi mereka tak sadar akan takdir ekstrem yang menanti mereka di bawah pengawasan ketat Dewan Siswa Bayangan (Underground Student Council).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sidebar / Episode List -->
+        <aside class="episodes-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fa-solid fa-list-ul"></i> Daftar Episode (13)</h3>
+            </div>
+            <div class="episodes-list" id="episodesList">
+                <!-- Episode items populated by JavaScript -->
+            </div>
+        </aside>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Prison Stream. Hosted on GitHub Pages & GitHub Releases for fast streaming.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

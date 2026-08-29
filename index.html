@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tariaki - Nonton Anime Streaming Sub Indo</title>
-    <link rel="stylesheet" href="styles.css?v=20250830d">
-    <link rel="manifest" href="manifest.json?v=20250830d">
-    <meta name="theme-color" content="#f97316">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <!-- Heavy libs lazy: hls.js + webtorrent loaded on demand via app.js for hemat kuota dashboard -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Navbar -->
@@ -26,61 +23,8 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="searchInput" placeholder="Cari anime..." oninput="filterCatalog()">
             </div>
-
-            <div class="auth-box" id="authBox">
-                <button id="loginBtn" class="btn-login"><i class="fa-brands fa-google"></i> Masuk</button>
-                <div id="userBox" class="user-box hidden">
-                    <img id="userPhoto" src="" alt="user" class="user-photo">
-                    <span id="userName" class="user-name"></span>
-                    <button id="logoutBtn" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
-                </div>
-            </div>
         </div>
     </header>
-
-    <!-- Login Gate - professional, block web sampai login -->
-    <div id="loginGate" class="login-gate">
-        <div class="login-gate-card">
-            <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:16px">
-                <div class="logo-icon" style="width:40px;height:40px;font-size:16px"><i class="fa-solid fa-play"></i></div>
-                <span style="font-weight:800;letter-spacing:0.5px">TARIAKI</span>
-            </div>
-            <h2 style="font-weight:800;font-size:22px;margin-bottom:8px">Login</h2>
-            <button id="gateLoginBtn" class="btn-login" style="margin-top:20px;justify-content:center;width:100%;background:#fff;color:#111;border:none;padding:12px;border-radius:12px;font-weight:700"><i class="fa-brands fa-google"></i> Lanjutkan dengan Google</button>
-            <button id="debugLoginBtn" class="btn-nav-ep" style="margin-top:10px;width:100%;justify-content:center;background:var(--bg-card);border:1px dashed var(--primary-orange);color:var(--primary-orange)"><i class="fa-solid fa-bug"></i> Masuk Debug (Muse Spark)</button>
-            <p style="color:var(--text-muted);font-size:11px;margin-top:12px">Dengan masuk, kamu setuju melanjutkan nonton di tariaki.vercel.app</p>
-        </div>
-    </div>
-
-    <!-- Profile Setup Modal - kustomisasi awal pro -->
-    <div id="profileSetupModal" class="modal-overlay hidden">
-        <div class="modal-card" style="max-width:520px;width:95%;max-height:90vh;overflow-y:auto">
-            <div class="modal-header" style="margin-bottom:8px"><i class="fa-solid fa-user-pen text-orange modal-icon"></i><h3>Kustomisasi Profil</h3></div>
-            <p class="modal-body" style="margin-bottom:12px">Atur nama, bio, pp & banner — pp otomatis deteksi foto/video.</p>
-            <div style="display:flex;flex-direction:column;gap:14px">
-                <label style="font-size:13px;font-weight:600">Nama<input id="profileName" type="text" placeholder="Nama" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></label>
-                <label style="font-size:13px;font-weight:600">Bio<textarea id="profileBio" placeholder="Bio singkat wibu..." rows="3" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></textarea></label>
-                <label style="font-size:13px;font-weight:600">PP Foto/Video (auto)<input id="profileAvatar" type="file" accept="image/*,video/*" style="margin-top:6px;width:100%;font-size:12px"></label>
-                <div id="avatarPreview" style="width:96px;height:96px;border-radius:50%;overflow:hidden;border:2px solid var(--primary-orange);display:none;margin:0 auto;background:#000">
-                    <img id="previewImg" style="width:100%;height:100%;object-fit:cover;display:none">
-                    <video id="previewVideo" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
-                </div>
-                <div id="videoTrimBox" style="display:none;flex-direction:column;gap:6px;background:var(--bg-dark);padding:10px;border-radius:8px;border:1px solid var(--border-color)">
-                    <label style="font-size:12px;color:var(--text-muted);font-weight:600">Atur bagian video pp (loop 3 detik)</label>
-                    <input id="avatarStart" type="range" min="0" max="10" step="0.1" value="0" style="width:100%">
-                    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)"><span id="trimStart">0.0s</span><span>Loop 3s</span></div>
-                </div>
-                <label style="font-size:13px;font-weight:600">Banner Belakang (foto / video berulang)<input id="profileBanner" type="file" accept="image/*,video/*" style="margin-top:6px;width:100%;font-size:12px"></label>
-                <div id="bannerPreview" style="width:100%;height:90px;border-radius:8px;overflow:hidden;border:1px solid var(--border-color);display:none;background:#000">
-                    <img id="bannerImg" style="width:100%;height:100%;object-fit:cover;display:none">
-                    <video id="bannerVideo" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
-                </div>
-            </div>
-            <div class="modal-actions" style="margin-top:16px">
-                <button id="saveProfileBtn" class="btn-modal-confirm" style="width:100%;justify-content:center">Simpan Profil <i class="fa-solid fa-check"></i></button>
-            </div>
-        </div>
-    </div>
 
     <!-- Main Container -->
     <main class="main-content">
@@ -88,15 +32,7 @@
         <section id="catalogView" class="view-section active">
             <div class="section-title-bar">
                 <h2><i class="fa-solid fa-fire text-orange"></i> Katalog Anime</h2>
-                <div style="display:flex;gap:8px;align-items:center">
-                    <select id="statusFilter" onchange="filterCatalog()" style="background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-main);padding:6px 10px;border-radius:8px;font-size:12px"><option value="">Semua</option><option value="Completed">Completed</option><option value="Ongoing">Ongoing</option></select>
-                    <span class="catalog-count">1 Anime</span>
-                </div>
-            </div>
-            <!-- Continue Watching -->
-            <div id="continueBox" style="display:none;margin-bottom:24px">
-                <h3 style="font-size:16px;font-weight:700;margin-bottom:12px"><i class="fa-solid fa-clock-rotate-left text-orange"></i> Lanjutkan Nonton</h3>
-                <div id="continueGrid" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px"></div>
+                <span class="catalog-count">1 Anime</span>
             </div>
 
             <div class="anime-grid" id="animeGrid">
@@ -123,7 +59,6 @@
                         <span class="badge badge-slate" id="animeEpCount">13 Episode</span>
                     </div>
                     <p id="animeSynopsis" class="synopsis"></p>
-                    <button id="detailFavBtn" onclick="toggleFavorite(selectedAnime.id)" class="btn-nav-ep" style="margin-top:8px;align-self:flex-start"><i class="fa-solid fa-heart"></i> Favorit</button>
                 </div>
             </div>
 
@@ -141,8 +76,7 @@
 
             <div class="player-container">
                 <div class="video-wrapper">
-                    <img id="videoPosterBlur" class="video-poster-blur" src="cover.webp" alt="poster" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(20px) brightness(0.7);transform:scale(1.1);transition:opacity 0.6s;opacity:1;z-index:1" onerror="this.src='cover.jpg'">
-                    <video id="videoPlayer" controls preload="metadata" style="z-index:2">
+                    <video id="videoPlayer" controls preload="none">
                         <source id="videoSource" src="" type="video/mp4">
                         Browser Anda tidak mendukung pemutar video HTML5.
                     </video>
@@ -166,17 +100,6 @@
                             Episode Selanjutnya <i class="fa-solid fa-step-forward"></i>
                         </button>
                     </div>
-                    <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
-                        <span style="font-size:12px;color:var(--text-muted)"><i class="fa-solid fa-gear"></i> Kualitas</span>
-                        <select id="qualitySelect" onchange="onQualityChange(this.value)" style="background:var(--bg-card);border:1px solid var(--border-color);color:var(--text-main);padding:6px 10px;border-radius:20px;font-size:12px;min-height:36px">
-                            <option value="auto">Auto (adaptif 1080p feel)</option>
-                            <option value="1080">1080p</option>
-                            <option value="720">720p</option>
-                            <option value="480">480p hemat</option>
-                        </select>
-                        <span id="qualityBadge" style="font-size:11px;color:var(--primary-orange);background:rgba(249,115,22,0.15);padding:4px 10px;border-radius:12px;border:1px solid rgba(249,115,22,0.3)">1080p • Auto</span>
-                        <span id="networkInfo" style="font-size:11px;color:var(--text-muted)"></span>
-                    </div>
                 </div>
 
                 <div class="player-meta">
@@ -192,32 +115,7 @@
                             <i class="fa-solid fa-download"></i> Unduh MKV
                         </a>
                     </div>
-                    <div style="display:flex;gap:10px;margin-top:12px">
-                        <button onclick="toggleLike()" class="btn-nav-ep"><i class="fa-solid fa-heart text-orange"></i> Like <span id="likeCount">0</span></button>
-                        <button id="pipBtn" class="btn-nav-ep"><i class="fa-solid fa-expand"></i> PIP</button>
-                        <span style="font-size:11px;color:var(--text-muted);align-self:center">Double-tap video ±10s</span>
-                    </div>
                 </div>
-                <!-- Komen -->
-                <div style="padding:16px 20px;background:var(--bg-card);border-top:1px solid var(--border-color)">
-                    <h4 style="font-size:14px;font-weight:700;margin-bottom:10px"><i class="fa-solid fa-comments text-orange"></i> Komentar</h4>
-                    <div style="display:flex;gap:8px;margin-bottom:12px">
-                        <input id="commentInput" placeholder="Tulis komen..." style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-dark);color:var(--text-main);font-size:13px">
-                        <button onclick="postComment()" class="btn-modal-confirm">Kirim</button>
-                    </div>
-                    <div id="commentList"></div>
-                </div>
-            </div>
-        </section>
-        <!-- 4. PROFILE VIEW -->
-        <section id="profileView" class="view-section hidden">
-            <button class="btn-back" onclick="showCatalog()"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
-            <div class="anime-profile-card" style="flex-direction:column;align-items:center;text-align:center">
-                <div id="profilePageBanner"></div>
-                <div id="profilePageAvatar" style="width:96px;height:96px;border-radius:50%;overflow:hidden;border:2px solid var(--primary-orange);background:#000;margin-top:-28px;position:relative;z-index:1"></div>
-                <h2 id="profilePageName" style="font-size:20px;font-weight:800"></h2>
-                <p id="profilePageBio" style="color:var(--text-muted);font-size:13px"></p>
-                <button onclick="document.getElementById('profileSetupModal').classList.remove('hidden')" class="btn-nav-ep">Edit Profil</button>
             </div>
         </section>
 
@@ -253,252 +151,11 @@
         </div>
     </footer>
 
+    <!-- Cache Manager Module -->
+    <script src="cacheManager.js"></script>
     <!-- Anime Catalog Data Module -->
-    <script src="animeData.js?v=20250830d"></script>
+    <script src="animeData.js"></script>
     <!-- Application Logic -->
-    <script src="app.js?v=20250830d"></script>
-    <!-- Firebase Google Auth + Gate Pro + Profile Auto + Banner Video -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        // storage lazy - hemat kuota dashboard 120KB
-        const firebaseConfig = {
-            apiKey: "AIzaSyB37kvN0_oyASUJFWmq_N9IZFKD6MHSq1g",
-            authDomain: "tariaki.firebaseapp.com",
-            projectId: "tariaki",
-            storageBucket: "tariaki.firebasestorage.app",
-            messagingSenderId: "668286766956",
-            appId: "1:668286766956:web:085eb028459e69f222ad49"
-        };
-        const SUPABASE_URL = "https://lwxoafywdcxaantcixcu.supabase.co";
-        const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3eG9hZnl3ZGN4YWFudGNpeGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDMwODEsImV4cCI6MjEwMzU3OTA4MX0.gDXLbkROBOoYUCb_ZwOBscteT9-VQsg0kDYpOPHuZTk";
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        let storage = null;
-        const provider = new GoogleAuthProvider();
-        const loginBtn = document.getElementById('loginBtn');
-        const gateLoginBtn = document.getElementById('gateLoginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const userBox = document.getElementById('userBox');
-        const userName = document.getElementById('userName');
-        const userPhoto = document.getElementById('userPhoto');
-        const loginGate = document.getElementById('loginGate');
-        const profileModal = document.getElementById('profileSetupModal');
-        const profileName = document.getElementById('profileName');
-        const profileBio = document.getElementById('profileBio');
-        const profileAvatar = document.getElementById('profileAvatar');
-        const profileBanner = document.getElementById('profileBanner');
-        const avatarPreview = document.getElementById('avatarPreview');
-        const previewImg = document.getElementById('previewImg');
-        const previewVideo = document.getElementById('previewVideo');
-        const bannerPreview = document.getElementById('bannerPreview');
-        const bannerImg = document.getElementById('bannerImg');
-        const bannerVideo = document.getElementById('bannerVideo');
-        const videoTrimBox = document.getElementById('videoTrimBox');
-        const avatarStart = document.getElementById('avatarStart');
-        const trimStart = document.getElementById('trimStart');
-        const saveBtn = document.getElementById('saveProfileBtn');
-        let currentUser = null;
-        let pendingAvatarFile = null;
-        let pendingBannerFile = null;
-
-        async function doLogin(){ try{ await signInWithPopup(auth, provider);}catch(e){alert('Login gagal: '+e.message);} }
-        loginBtn.onclick = doLogin;
-        if(gateLoginBtn) gateLoginBtn.onclick = doLogin;
-        // debug toggle biar Muse bisa masuk liat keluh kesah lu tanpa Google
-        const debugBtn=document.getElementById('debugLoginBtn');
-        if(debugBtn) debugBtn.onclick = ()=>{
-            const fake={uid:'debug-muse-spark', email:'muse@spark.debug', displayName:'Muse Spark (Debug)'};
-            localStorage.setItem('tariaki_user', JSON.stringify(fake));
-            localStorage.setItem('tariaki_profile', JSON.stringify({uid:fake.uid, display_name:'Muse Spark', bio:'Debug', avatar_url:'poster.svg', avatar_type:'image'}));
-            loginGate.style.display='none';
-            const main=document.querySelector('.main-content'); if(main){ main.style.display='block'; main.classList.add('auth-ready'); }
-            document.body.style.overflow='';
-            loginBtn.style.display='none';
-            const ub=document.getElementById('userBox'); if(ub){ ub.style.display='flex'; ub.classList.remove('hidden'); document.getElementById('userName').textContent='Muse Spark (Debug)'; }
-        };
-        logoutBtn.onclick = () => { localStorage.removeItem('tariaki_user'); localStorage.removeItem('tariaki_profile'); signOut(auth); location.reload(); };
-
-        profileAvatar.onchange = () => {
-            const f = profileAvatar.files[0];
-            pendingAvatarFile = f || null;
-            if(!f){ avatarPreview.style.display='none'; videoTrimBox.style.display='none'; return; }
-            avatarPreview.style.display='block';
-            const isVideo = f.type.startsWith('video/');
-            if(isVideo){
-                previewImg.style.display='none';
-                previewVideo.style.display='block';
-                previewVideo.src = URL.createObjectURL(f);
-                previewVideo.onloadedmetadata = ()=>{
-                    const dur = Math.max(3, Math.min(10, previewVideo.duration-3));
-                    avatarStart.max = dur.toFixed(1);
-                    videoTrimBox.style.display='flex';
-                };
-            } else {
-                previewVideo.style.display='none';
-                previewImg.style.display='block';
-                previewImg.src = URL.createObjectURL(f);
-                videoTrimBox.style.display='none';
-            }
-        };
-        if(avatarStart) avatarStart.oninput = ()=>{
-            trimStart.textContent = parseFloat(avatarStart.value).toFixed(1)+'s';
-            if(previewVideo.src) previewVideo.currentTime = parseFloat(avatarStart.value);
-        };
-        if(profileBanner) profileBanner.onchange = ()=>{
-            const f = profileBanner.files[0];
-            pendingBannerFile = f || null;
-            if(!f){ bannerPreview.style.display='none'; return; }
-            bannerPreview.style.display='block';
-            const isVideo = f.type.startsWith('video/');
-            if(isVideo){
-                bannerImg.style.display='none';
-                bannerVideo.style.display='block';
-                bannerVideo.src = URL.createObjectURL(f);
-            } else {
-                bannerVideo.style.display='none';
-                bannerImg.style.display='block';
-                bannerImg.src = URL.createObjectURL(f);
-            }
-        };
-
-        async function fetchProfile(uid){
-            try{
-                const r = await fetch(`${SUPABASE_URL}/rest/v1/profiles?uid=eq.${uid}&select=*`, { headers:{ apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`}});
-                const j = await r.json();
-                return j[0] || null;
-            }catch(e){ return null; }
-        }
-        async function saveProfile(){
-            if(!currentUser) return;
-            const name = profileName.value.trim() || currentUser.displayName || 'Wibu';
-            const bio = profileBio.value.trim() || '';
-            const start = parseFloat(avatarStart?.value||0);
-            saveBtn.textContent='Menyimpan...'; saveBtn.disabled=true;
-            // lazy load storage 120KB cuma saat save - hemat kuota dashboard
-            if(!storage){
-                const mod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
-                storage = mod.getStorage(app);
-                window._fsRef = mod.ref; window._fsUpload = mod.uploadBytes; window._fsURL = mod.getDownloadURL;
-            }
-            const _ref = window._fsRef, _up = window._fsUpload, _url = window._fsURL;
-            let avatar_url = currentUser.photoURL || '';
-            let avatar_type = 'image';
-            let banner_url = '';
-            let banner_type = 'image';
-            if(pendingAvatarFile){
-                const ext = pendingAvatarFile.name.split('.').pop();
-                const isVideo = pendingAvatarFile.type.startsWith('video/');
-                avatar_type = isVideo ? 'video' : 'image';
-                const storageRef = _ref(storage, `avatars/${currentUser.uid}.${ext}`);
-                await _up(storageRef, pendingAvatarFile);
-                avatar_url = await _url(storageRef);
-            } else {
-                const existing = JSON.parse(localStorage.getItem('tariaki_profile')||'{}');
-                if(existing.avatar_url){ avatar_url=existing.avatar_url; avatar_type=existing.avatar_type; }
-            }
-            if(pendingBannerFile){
-                const ext2 = pendingBannerFile.name.split('.').pop();
-                const isVideo2 = pendingBannerFile.type.startsWith('video/');
-                banner_type = isVideo2 ? 'video' : 'image';
-                const bRef = _ref(storage, `banners/${currentUser.uid}.${ext2}`);
-                await _up(bRef, pendingBannerFile);
-                banner_url = await _url(bRef);
-            } else {
-                const existing2 = JSON.parse(localStorage.getItem('tariaki_profile')||'{}');
-                if(existing2.banner_url){ banner_url=existing2.banner_url; banner_type=existing2.banner_type; }
-            }
-            const payload = { uid: currentUser.uid, email: currentUser.email, display_name: name, bio, avatar_url, avatar_type, banner_url, banner_type, avatar_start: start };
-            await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
-                method:'POST',
-                headers:{ apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates' },
-                body: JSON.stringify(payload)
-            });
-            localStorage.setItem('tariaki_profile', JSON.stringify(payload));
-            profileModal.classList.add('hidden');
-            applyProfileToUI(payload);
-            saveBtn.textContent='Simpan Profil'; saveBtn.disabled=false;
-        }
-        saveBtn.onclick = saveProfile;
-
-        function applyProfileToUI(p){
-            userName.textContent = p.display_name || currentUser.displayName;
-            if(p.avatar_type==='video' && p.avatar_url){
-                userPhoto.style.display='none';
-                let v = document.getElementById('userVideo');
-                if(!v){
-                    v = document.createElement('video');
-                    v.id='userVideo'; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true;
-                    v.className='user-photo'; v.style.objectFit='cover';
-                    userPhoto.parentNode.insertBefore(v, userPhoto);
-                }
-                v.src = p.avatar_url + (p.avatar_start?`#t=${p.avatar_start}`:''); v.style.display='block';
-                if(p.avatar_start) v.onloadedmetadata=()=>{ v.currentTime=p.avatar_start; };
-            } else {
-                let v=document.getElementById('userVideo'); if(v) v.style.display='none';
-                userPhoto.style.display='block';
-                userPhoto.src = p.avatar_url || currentUser.photoURL || 'poster.svg';
-            }
-            // banner in profile page
-            const av=document.getElementById('profilePageAvatar');
-            const bannerEl=document.getElementById('profilePageBanner');
-            if(av){
-                if(p.avatar_type==='video') av.innerHTML=`<video src="${p.avatar_url}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`;
-                else av.innerHTML=`<img src="${p.avatar_url||'poster.svg'}" style="width:100%;height:100%;object-fit:cover">`;
-                if(bannerEl){
-                    if(p.banner_type==='video' && p.banner_url) bannerEl.innerHTML=`<video src="${p.banner_url}" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover"></video>`;
-                    else if(p.banner_url) bannerEl.innerHTML=`<img src="${p.banner_url}" style="width:100%;height:100%;object-fit:cover">`;
-                    else bannerEl.innerHTML='';
-                }
-            }
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            const main=document.querySelector('.main-content');
-            if(!user){
-                currentUser=null;
-                loginBtn.style.display='inline-flex';
-                userBox.style.display='none';
-                userBox.classList.add('hidden');
-                loginGate.style.display='flex';
-                if(main){ main.style.display='none'; main.classList.remove('auth-ready'); }
-                document.body.style.overflow='hidden';
-                localStorage.removeItem('tariaki_user');
-                return;
-            }
-            currentUser=user;
-            loginBtn.style.display='none';
-            userBox.style.display='flex';
-            userBox.classList.remove('hidden');
-            loginGate.style.display='none';
-            if(main){ main.style.display='block'; main.classList.add('auth-ready'); }
-            document.body.style.overflow='';
-            localStorage.setItem('tariaki_user', JSON.stringify({uid:user.uid, email:user.email, name:user.displayName}));
-            // cek cache dulu biar gak kedip modal tiap reload
-            const cached = JSON.parse(localStorage.getItem('tariaki_profile')||'null');
-            if(cached && cached.display_name){
-                applyProfileToUI(cached);
-                return;
-            }
-            const profile = await fetchProfile(user.uid);
-            if(!profile || !profile.display_name){
-                profileName.value = user.displayName || '';
-                profileBio.value = profile?.bio || '';
-                // jangan paksa kalo udah pernah isi bio/avatar
-                const hasBio = profile && profile.bio;
-                const hasAvatar = profile && profile.avatar_url;
-                if(!hasBio && !hasAvatar){
-                    profileModal.classList.remove('hidden');
-                } else {
-                    if(profile) { localStorage.setItem('tariaki_profile', JSON.stringify(profile)); applyProfileToUI(profile); }
-                }
-            } else {
-                localStorage.setItem('tariaki_profile', JSON.stringify(profile));
-                applyProfileToUI(profile);
-            }
-        });
-        document.getElementById('userBox').onclick = (e)=>{ if(e.target.id!=='logoutBtn' && !e.target.closest('#logoutBtn')){ profileModal.classList.remove('hidden'); } };
-        window.firebaseAuth = auth;
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

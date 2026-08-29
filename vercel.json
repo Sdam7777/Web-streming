@@ -1,8 +1,0 @@
-{
-  "headers": [
-    {
-      "source": "/api/views",
-      "headers": [{ "key": "Cache-Control", "value": "public, s-maxage=60, stale-while-revalidate=300" }]
-    }
-  ]
-}

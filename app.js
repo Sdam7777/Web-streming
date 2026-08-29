@@ -44,17 +44,32 @@ function renderCatalog() {
   updateFavUI();
 }
 
-function openAnimeDetail(id) {
+async function openAnimeDetail(id) {
   selectedAnime = catalog.find(a => a.id === id);
   if (!selectedAnime) return;
+  // lazy load episodes for hemat kuota dashboard - cuma load saat buka detail
+  if(!selectedAnime.categories || selectedAnime.categories.length===0){
+    document.getElementById("episodesCategoryContainer").innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:12px">Memuat episode...</div>';
+    await loadEpisodesForAnime(id);
+  }
   const posterImg = document.getElementById("animePoster");
-  posterImg.src = selectedAnime.poster;
+  posterImg.src = selectedAnime.mal_image || selectedAnime.poster;
   posterImg.onerror = () => { posterImg.src = "poster.svg"; };
   document.getElementById("animeTitle").textContent = selectedAnime.title;
   document.getElementById("animeType").textContent = selectedAnime.type;
   document.getElementById("animeStatus").textContent = selectedAnime.status;
   document.getElementById("animeEpCount").textContent = `${selectedAnime.totalEp} Episode`;
   document.getElementById("animeSynopsis").textContent = selectedAnime.synopsis;
+  // MAL rating patokan
+  const badges = document.querySelector('.anime-badges');
+  let malBadge = document.getElementById('malScore');
+  if(!malBadge && selectedAnime.score){
+    malBadge = document.createElement('span');
+    malBadge.id='malScore';
+    malBadge.className='badge badge-orange';
+    badges.appendChild(malBadge);
+  }
+  if(malBadge) malBadge.innerHTML = `<i class="fa-solid fa-star"></i> ${selectedAnime.score} • ${selectedAnime.members?.toLocaleString('id-ID')} users`;
   const favDetail = document.getElementById('detailFavBtn');
   if(favDetail) favDetail.innerHTML = `<i class="fa-solid fa-heart"></i> ${(JSON.parse(localStorage.getItem('tariaki_favs')||'[]').includes(id)?'Hapus Favorit':'Favorit')}`;
   const container = document.getElementById("episodesCategoryContainer");

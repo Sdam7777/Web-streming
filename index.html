@@ -9,8 +9,7 @@
     <meta name="theme-color" content="#f97316">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.7/dist/hls.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/webtorrent@1.9.7/webtorrent.min.js"></script>
+    <!-- Heavy libs lazy: hls.js + webtorrent loaded on demand via app.js for hemat kuota dashboard -->
 </head>
 <body>
     <!-- Navbar -->
@@ -261,7 +260,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+        // storage lazy - hemat kuota dashboard 120KB
         const firebaseConfig = {
             apiKey: "AIzaSyB37kvN0_oyASUJFWmq_N9IZFKD6MHSq1g",
             authDomain: "tariaki.firebaseapp.com",
@@ -274,7 +273,7 @@
         const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3eG9hZnl3ZGN4YWFudGNpeGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDMwODEsImV4cCI6MjEwMzU3OTA4MX0.gDXLbkROBOoYUCb_ZwOBscteT9-VQsg0kDYpOPHuZTk";
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const storage = getStorage(app);
+        let storage = null;
         const provider = new GoogleAuthProvider();
         const loginBtn = document.getElementById('loginBtn');
         const gateLoginBtn = document.getElementById('gateLoginBtn');
@@ -363,6 +362,13 @@
             const bio = profileBio.value.trim() || '';
             const start = parseFloat(avatarStart?.value||0);
             saveBtn.textContent='Menyimpan...'; saveBtn.disabled=true;
+            // lazy load storage 120KB cuma saat save - hemat kuota dashboard
+            if(!storage){
+                const mod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js");
+                storage = mod.getStorage(app);
+                window._fsRef = mod.ref; window._fsUpload = mod.uploadBytes; window._fsURL = mod.getDownloadURL;
+            }
+            const _ref = window._fsRef, _up = window._fsUpload, _url = window._fsURL;
             let avatar_url = currentUser.photoURL || '';
             let avatar_type = 'image';
             let banner_url = '';
@@ -371,9 +377,9 @@
                 const ext = pendingAvatarFile.name.split('.').pop();
                 const isVideo = pendingAvatarFile.type.startsWith('video/');
                 avatar_type = isVideo ? 'video' : 'image';
-                const storageRef = ref(storage, `avatars/${currentUser.uid}.${ext}`);
-                await uploadBytes(storageRef, pendingAvatarFile);
-                avatar_url = await getDownloadURL(storageRef);
+                const storageRef = _ref(storage, `avatars/${currentUser.uid}.${ext}`);
+                await _up(storageRef, pendingAvatarFile);
+                avatar_url = await _url(storageRef);
             } else {
                 const existing = JSON.parse(localStorage.getItem('tariaki_profile')||'{}');
                 if(existing.avatar_url){ avatar_url=existing.avatar_url; avatar_type=existing.avatar_type; }
@@ -382,9 +388,9 @@
                 const ext2 = pendingBannerFile.name.split('.').pop();
                 const isVideo2 = pendingBannerFile.type.startsWith('video/');
                 banner_type = isVideo2 ? 'video' : 'image';
-                const bRef = ref(storage, `banners/${currentUser.uid}.${ext2}`);
-                await uploadBytes(bRef, pendingBannerFile);
-                banner_url = await getDownloadURL(bRef);
+                const bRef = _ref(storage, `banners/${currentUser.uid}.${ext2}`);
+                await _up(bRef, pendingBannerFile);
+                banner_url = await _url(bRef);
             } else {
                 const existing2 = JSON.parse(localStorage.getItem('tariaki_profile')||'{}');
                 if(existing2.banner_url){ banner_url=existing2.banner_url; banner_type=existing2.banner_type; }

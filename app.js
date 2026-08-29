@@ -2,7 +2,7 @@ const catalog = [
   {
     id: "prison-school",
     title: "Prison School (Sub Indo)",
-    poster: "./poster.svg",
+    poster: "cover.jpg",
     type: "TV Series + OVA",
     status: "Completed",
     totalEp: 13,
@@ -45,7 +45,7 @@ function renderCatalog() {
 
     card.innerHTML = `
       <div class="card-poster">
-        <img src="${item.poster}" alt="${item.title}" loading="lazy">
+        <img src="${item.poster}" alt="${item.title}" loading="lazy" onerror="this.onerror=null; this.src='poster.svg';">
       </div>
       <div class="card-content">
         <div class="card-title">${item.title}</div>
@@ -63,7 +63,10 @@ function openAnimeDetail(id) {
   selectedAnime = catalog.find(a => a.id === id);
   if (!selectedAnime) return;
 
-  document.getElementById("animePoster").src = selectedAnime.poster;
+  const posterImg = document.getElementById("animePoster");
+  posterImg.src = selectedAnime.poster;
+  posterImg.onerror = () => { posterImg.src = "poster.svg"; };
+
   document.getElementById("animeTitle").textContent = selectedAnime.title;
   document.getElementById("animeType").textContent = selectedAnime.type;
   document.getElementById("animeStatus").textContent = selectedAnime.status;

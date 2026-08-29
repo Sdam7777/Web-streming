@@ -196,18 +196,20 @@ body {
     border-color: var(--primary-orange);
 }
 
-/* Login Gate - professional, secure */
+/* Login Gate - professional, secure - hidden awal biar gak kedip */
 .login-gate {
     position: fixed;
     inset: 0;
     background: radial-gradient(ellipse at top, #1a1a1d 0%, #09090b 55%, #000 100%);
     backdrop-filter: blur(10px);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 2000;
     padding: 20px;
 }
+.main-content { display: none; }
+.main-content.auth-ready { display: block; }
 .login-gate-card {
     background: linear-gradient(180deg, var(--bg-card) 0%, #121215 100%);
     border: 1px solid var(--border-color);

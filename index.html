@@ -3,69 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prison School Sub Indo - Streaming & Download</title>
+    <title>Tariaki - Premium Anime Streaming</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Navbar -->
     <header class="navbar">
         <div class="container nav-container">
             <div class="logo">
-                <i class="fa-solid fa-film"></i>
-                <span>Prison Stream</span>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="#F97316"/>
+                    <path d="M12 9L23 16L12 23V9Z" fill="#09090B"/>
+                </svg>
+                <span class="logo-text">TARIAKI</span>
             </div>
+
             <div class="search-bar">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" id="searchInput" placeholder="Cari episode..." onkeyup="filterEpisodes()">
             </div>
-            <div class="nav-links">
-                <span class="badge"><i class="fa-solid fa-bolt"></i> GitHub Hosted</span>
+
+            <div class="nav-actions">
+                <div class="badge-status">
+                    <span class="status-dot"></span>
+                    <span>HD 1080p</span>
+                </div>
             </div>
         </div>
     </header>
 
+    <!-- Main Content Grid -->
     <main class="container main-content">
-        <!-- Main Player Section -->
+        <!-- Video Player Section -->
         <section class="player-section">
-            <div class="video-container">
-                <video id="videoPlayer" controls preload="metadata">
-                    <source id="videoSource" src="" type="video/mp4">
-                    Browser Anda tidak mendukung pemutar video HTML5.
-                </video>
-            </div>
-            <div class="video-details">
-                <div class="video-header">
-                    <div>
-                        <h2 id="currentEpisodeTitle">Prison School - Episode 01</h2>
-                        <p class="subtitle" id="currentEpisodeSub">Format: MKV Subtitle Indonesia | Ukuran: 113.59 MB</p>
-                    </div>
-                    <div class="action-buttons">
-                        <a id="downloadBtn" href="#" class="btn btn-primary" download target="_blank">
-                            <i class="fa-solid fa-download"></i> Unduh Episode
-                        </a>
-                    </div>
+            <div class="video-card">
+                <div class="video-container">
+                    <video id="videoPlayer" controls preload="metadata">
+                        <source id="videoSource" src="" type="video/mp4">
+                        Browser Anda tidak mendukung pemutar video HTML5.
+                    </video>
                 </div>
-                <div class="info-card">
-                    <h3><i class="fa-solid fa-circle-info"></i> Sinopsis Anime</h3>
-                    <p>Hachimitsu Private Academy, institusi boarding school putri berasrama paling bergengsi di Tokyo, memutuskan untuk mengizinkan murid laki-laki masuk pertama kali dalam sejarah sekolah tersebut. Lima anak laki-laki diterima, tetapi mereka tak sadar akan takdir ekstrem yang menanti mereka di bawah pengawasan ketat Dewan Siswa Bayangan (Underground Student Council).</p>
+
+                <div class="video-details">
+                    <div class="video-header">
+                        <div class="title-meta">
+                            <h1 id="currentEpisodeTitle">Prison School - Episode 01</h1>
+                            <div class="meta-tags">
+                                <span class="tag tag-orange" id="qualityBadge">HD 1080p</span>
+                                <span class="tag" id="sizeBadge">113.59 MB</span>
+                                <span class="tag tag-view" id="viewCountBadge"><i class="fa-solid fa-eye"></i> <span id="viewCountText">--</span> views</span>
+                            </div>
+                        </div>
+
+                        <div class="action-group">
+                            <a id="downloadBtn" href="#" class="btn btn-primary" download target="_blank">
+                                <i class="fa-solid fa-download"></i> Download
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Sinopsis & Info -->
+                    <div class="info-box">
+                        <div class="info-header">
+                            <i class="fa-solid fa-film"></i>
+                            <span>Tentang Serial Ini</span>
+                        </div>
+                        <p class="synopsis">
+                            Hachimitsu Private Academy, institusi boarding school putri berasrama paling bergengsi di Tokyo, memutuskan untuk mengizinkan murid laki-laki masuk pertama kali dalam sejarah sekolah tersebut. Lima anak laki-laki diterima, tetapi mereka tak sadar akan takdir ekstrem yang menanti mereka di bawah pengawasan ketat Dewan Siswa Bayangan (Underground Student Council).
+                        </p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Sidebar / Episode List -->
+        <!-- Episodes Sidebar -->
         <aside class="episodes-sidebar">
             <div class="sidebar-header">
-                <h3><i class="fa-solid fa-list-ul"></i> Daftar Episode (13)</h3>
+                <h2><i class="fa-solid fa-layer-group"></i> Daftar Episode</h2>
+                <span class="ep-count" id="epCount">13 Episode</span>
             </div>
+
             <div class="episodes-list" id="episodesList">
-                <!-- Episode items populated by JavaScript -->
+                <!-- Items generated via JavaScript -->
             </div>
         </aside>
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 Prison Stream. Hosted on GitHub Pages & GitHub Releases for fast streaming.</p>
+        <div class="container footer-content">
+            <div class="footer-logo">
+                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="#F97316"/>
+                    <path d="M12 9L23 16L12 23V9Z" fill="#09090B"/>
+                </svg>
+                <span>TARIAKI</span>
+            </div>
+            <p>&copy; 2026 Tariaki Media. Ultra-fast streaming powered by Upstash, Supabase & Vercel Edge CDN.</p>
         </div>
     </footer>
 

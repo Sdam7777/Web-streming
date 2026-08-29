@@ -111,14 +111,18 @@ let filteredEpisodes = [...episodes];
 document.addEventListener("DOMContentLoaded", () => {
     renderEpisodesList();
     loadEpisode(activeIndex);
+    setupAutoResume();
 });
 
 function renderEpisodesList() {
     const listContainer = document.getElementById("episodesList");
+    const epCountEl = document.getElementById("epCount");
+
     listContainer.innerHTML = "";
+    epCountEl.textContent = `${filteredEpisodes.length} Episode`;
 
     if (filteredEpisodes.length === 0) {
-        listContainer.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">Tidak ada episode yang ditemukan</div>`;
+        listContainer.innerHTML = `<div style="text-align:center; padding: 24px; color: var(--text-muted);">Episode tidak ditemukan</div>`;
         return;
     }
 
@@ -136,9 +140,9 @@ function renderEpisodesList() {
                     ${ep.title}
                     ${ep.isOva ? '<span class="badge-ova">OVA</span>' : ''}
                 </div>
-                <div class="episode-meta">Ukuran: ${ep.size}</div>
+                <div class="episode-meta">Size: ${ep.size}</div>
             </div>
-            <i class="fa-solid ${isActive ? 'fa-circle-play' : 'fa-play'}" style="color: ${isActive ? 'var(--primary-color)' : 'var(--text-muted)'}"></i>
+            <i class="fa-solid ${isActive ? 'fa-circle-play' : 'fa-play'}" style="color: ${isActive ? 'var(--primary-orange)' : 'var(--text-muted)'}"></i>
         `;
 
         listContainer.appendChild(item);
@@ -150,7 +154,6 @@ function selectEpisode(index) {
     renderEpisodesList();
     loadEpisode(index);
 
-    // Scroll player into view on mobile
     if (window.innerWidth <= 992) {
         document.querySelector('.player-section').scrollIntoView({ behavior: 'smooth' });
     }
@@ -161,17 +164,47 @@ function loadEpisode(index) {
     const player = document.getElementById("videoPlayer");
     const source = document.getElementById("videoSource");
     const titleEl = document.getElementById("currentEpisodeTitle");
-    const subEl = document.getElementById("currentEpisodeSub");
+    const sizeBadge = document.getElementById("sizeBadge");
     const downloadBtn = document.getElementById("downloadBtn");
 
     source.src = ep.url;
     player.load();
 
-    titleEl.textContent = ep.title;
-    subEl.textContent = `Format: MKV Subtitle Indonesia | Ukuran: ${ep.size}`;
+    // Auto resume progress from LocalStorage/Supabase cache
+    const savedTime = localStorage.getItem(`tariaki_progress_${ep.name}`);
+    if (savedTime) {
+        player.currentTime = parseFloat(savedTime);
+    }
 
+    titleEl.textContent = ep.title;
+    sizeBadge.textContent = ep.size;
     downloadBtn.href = ep.url;
     downloadBtn.setAttribute("download", ep.name);
+
+    // Fetch and increment views count using Upstash Redis
+    fetchEpisodeViews(ep.name);
+}
+
+function setupAutoResume() {
+    const player = document.getElementById("videoPlayer");
+    player.ontimeupdate = () => {
+        if (player.duration && player.currentTime > 5) {
+            const ep = episodes[activeIndex];
+            localStorage.setItem(`tariaki_progress_${ep.name}`, player.currentTime);
+        }
+    };
+}
+
+async function fetchEpisodeViews(epName) {
+    const viewText = document.getElementById("viewCountText");
+    try {
+        // Call serverless API proxy to safely update views without exposing Redis API secrets
+        const res = await fetch(`/api/views?episode=${encodeURIComponent(epName)}`);
+        const data = await res.json();
+        viewText.textContent = data.views || "1";
+    } catch (e) {
+        viewText.textContent = "1";
+    }
 }
 
 function filterEpisodes() {

@@ -1,53 +1,15 @@
-const catalog = [
-  {
-    id: "prison-school",
-    title: "Prison School (Sub Indo)",
-    poster: "cover.jpg",
-    type: "TV Series + OVA",
-    status: "Completed",
-    totalEp: 13,
-    synopsis: "Hachimitsu Private Academy, institusi boarding school putri berasrama paling bergengsi di Tokyo, memutuskan untuk mengizinkan murid laki-laki masuk pertama kali dalam sejarah sekolah tersebut. Lima anak laki-laki diterima, tetapi mereka tak sadar akan takdir ekstrem yang menanti mereka di bawah pengawasan ketat Dewan Siswa Bayangan (Underground Student Council).",
-    categories: [
-      {
-        name: "TV Series (12 Episode)",
-        icon: "fa-film",
-        episodes: [
-          { id: 1, title: "Prison School - Episode 01", name: "Prison_School_01.mkv", size: "113.59 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_01.mkv" },
-          { id: 2, title: "Prison School - Episode 02", name: "Prison_School_02.mkv", size: "109.94 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_02.mkv" },
-          { id: 3, title: "Prison School - Episode 03", name: "Prison_School_03.mkv", size: "108.78 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_03.mkv" },
-          { id: 4, title: "Prison School - Episode 04", name: "Prison_School_04.mkv", size: "110.26 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_04.mkv" },
-          { id: 5, title: "Prison School - Episode 05", name: "Prison_School_05.mkv", size: "83.43 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_05.mkv" },
-          { id: 6, title: "Prison School - Episode 06", name: "Prison_School_06.mkv", size: "97.43 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_06.mkv" },
-          { id: 7, title: "Prison School - Episode 07", name: "Prison_School_07.mkv", size: "108.20 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_07.mkv" },
-          { id: 8, title: "Prison School - Episode 08", name: "Prison_School_08.mkv", size: "98.18 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_08.mkv" },
-          { id: 9, title: "Prison School - Episode 09", name: "Prison_School_09.mkv", size: "110.35 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_09.mkv" },
-          { id: 10, title: "Prison School - Episode 10", name: "Prison_School_10.mkv", size: "104.33 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_10.mkv" },
-          { id: 11, title: "Prison School - Episode 11", name: "Prison_School_11.mkv", size: "97.01 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_11.mkv" },
-          { id: 12, title: "Prison School - Episode 12 (END)", name: "Prison_School_12_END.mkv", size: "110.16 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_12_END.mkv" }
-        ]
-      },
-      {
-        name: "OVA (Original Video Animation)",
-        icon: "fa-star",
-        episodes: [
-          { id: 13, title: "Prison School - OVA 1", name: "Prison_School_OVA1.mkv", size: "80.33 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_OVA1.mkv" }
-        ]
-      }
-    ]
-  }
-];
-
 let selectedAnime = null;
 let selectedEpisode = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   renderCatalog();
   document.getElementById("logoBtn").onclick = () => showCatalog();
-  setupAutoResume();
+  setupAutoResumeAndAutoNext();
 });
 
 function renderCatalog() {
   const grid = document.getElementById("animeGrid");
+  if (!grid) return;
   grid.innerHTML = "";
 
   catalog.forEach(item => {
@@ -88,9 +50,10 @@ function openAnimeDetail(id) {
   const container = document.getElementById("episodesCategoryContainer");
   container.innerHTML = "";
 
-  selectedAnime.categories.forEach((cat, index) => {
+  selectedAnime.categories.forEach((cat) => {
     const sec = document.createElement("div");
-    sec.className = "episodes-category-group";
+    // Collapse all episode categories by default as requested by user
+    sec.className = "episodes-category-group collapsed";
 
     const header = document.createElement("div");
     header.className = "category-header";
@@ -153,8 +116,111 @@ function playEpisode(ep) {
   downloadBtn.href = ep.url;
   downloadBtn.setAttribute("download", ep.name);
 
+  // Sync player episode dropdown & nav buttons
+  updatePlayerEpisodeControls();
+
   fetchEpisodeViews(ep.name);
   switchView("playerView");
+}
+
+function getAllEpisodesFlat() {
+  if (!selectedAnime) return [];
+  const flat = [];
+  selectedAnime.categories.forEach(cat => {
+    cat.episodes.forEach(ep => {
+      flat.push({ ...ep, categoryType: cat.typeKey });
+    });
+  });
+  return flat;
+}
+
+function updatePlayerEpisodeControls() {
+  const select = document.getElementById("playerEpisodeSelect");
+  const prevBtn = document.getElementById("prevEpBtn");
+  const nextBtn = document.getElementById("nextEpBtn");
+  if (!select) return;
+
+  const episodes = getAllEpisodesFlat();
+  select.innerHTML = "";
+
+  let currentIndex = -1;
+
+  episodes.forEach((ep, idx) => {
+    const opt = document.createElement("option");
+    opt.value = ep.name;
+    opt.textContent = ep.title;
+    if (selectedEpisode && selectedEpisode.name === ep.name) {
+      opt.selected = true;
+      currentIndex = idx;
+    }
+    select.appendChild(opt);
+  });
+
+  if (prevBtn) {
+    prevBtn.disabled = currentIndex <= 0;
+  }
+  if (nextBtn) {
+    nextBtn.disabled = currentIndex === -1 || currentIndex >= episodes.length - 1;
+  }
+}
+
+function onPlayerSelectChange(selectEl) {
+  const selectedName = selectEl.value;
+  const episodes = getAllEpisodesFlat();
+  const targetEp = episodes.find(e => e.name === selectedName);
+  if (targetEp) {
+    playEpisode(targetEp);
+  }
+}
+
+function playPrevEpisode() {
+  const episodes = getAllEpisodesFlat();
+  if (!selectedEpisode) return;
+  const idx = episodes.findIndex(e => e.name === selectedEpisode.name);
+  if (idx > 0) {
+    playEpisode(episodes[idx - 1]);
+  }
+}
+
+function playNextEpisode() {
+  const episodes = getAllEpisodesFlat();
+  if (!selectedEpisode) return;
+  const idx = episodes.findIndex(e => e.name === selectedEpisode.name);
+
+  if (idx >= 0 && idx < episodes.length - 1) {
+    const currentEp = episodes[idx];
+    const nextEp = episodes[idx + 1];
+
+    // Check if transitioning from TV Series END to OVA
+    if (currentEp.categoryType === "TV" && nextEp.categoryType === "OVA") {
+      openOvaModal();
+    } else {
+      playEpisode(nextEp);
+    }
+  }
+}
+
+function openOvaModal() {
+  const modal = document.getElementById("ovaPromptModal");
+  if (modal) {
+    modal.classList.remove("hidden");
+  }
+}
+
+function closeOvaModal() {
+  const modal = document.getElementById("ovaPromptModal");
+  if (modal) {
+    modal.classList.add("hidden");
+  }
+}
+
+function confirmPlayOva() {
+  closeOvaModal();
+  const episodes = getAllEpisodesFlat();
+  const ovaEp = episodes.find(e => e.categoryType === "OVA");
+  if (ovaEp) {
+    playEpisode(ovaEp);
+  }
 }
 
 function switchView(viewId) {
@@ -163,8 +229,10 @@ function switchView(viewId) {
     sec.classList.add("hidden");
   });
   const activeSec = document.getElementById(viewId);
-  activeSec.classList.remove("hidden");
-  activeSec.classList.add("active");
+  if (activeSec) {
+    activeSec.classList.remove("hidden");
+    activeSec.classList.add("active");
+  }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -193,17 +261,26 @@ function filterCatalog() {
   });
 }
 
-function setupAutoResume() {
+function setupAutoResumeAndAutoNext() {
   const player = document.getElementById("videoPlayer");
+  if (!player) return;
+
   player.ontimeupdate = () => {
     if (selectedEpisode && player.duration && player.currentTime > 5) {
       localStorage.setItem(`tariaki_progress_${selectedEpisode.name}`, player.currentTime);
     }
   };
+
+  // Auto-next playback handler
+  player.onended = () => {
+    playNextEpisode();
+  };
 }
 
 async function fetchEpisodeViews(epName) {
   const viewText = document.getElementById("viewCountText");
+  if (!viewText) return;
+
   const cacheKey = `tariaki_view_${epName}`;
   const cachedViews = sessionStorage.getItem(cacheKey);
 

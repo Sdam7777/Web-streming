@@ -140,10 +140,12 @@ function playEpisode(ep) {
   source.src = ep.url;
   player.load();
 
-  // Saved time resume
+  // Saved time resume on metadata loaded
   const savedTime = localStorage.getItem(`tariaki_progress_${ep.name}`);
   if (savedTime) {
-    player.currentTime = parseFloat(savedTime);
+    player.addEventListener('loadedmetadata', () => {
+      player.currentTime = parseFloat(savedTime);
+    }, { once: true });
   }
 
   titleEl.textContent = ep.title;

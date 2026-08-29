@@ -328,22 +328,43 @@ body {
     margin-bottom: 24px;
 }
 
-.category-title {
-    font-size: 17px;
+.category-header {
+    font-size: 16px;
     font-weight: 700;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
     color: var(--text-main);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
+    padding-bottom: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition);
+}
+
+.category-header:hover {
+    color: var(--primary-orange);
+}
+
+.category-header .chevron-icon {
+    font-size: 14px;
+    transition: transform 0.25s ease;
+}
+
+.episodes-category-group.collapsed .chevron-icon {
+    transform: rotate(-90deg);
+}
+
+.episodes-category-group.collapsed .episodes-grid {
+    display: none;
 }
 
 .episodes-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 12px;
+    transition: var(--transition);
 }
 
 .ep-button {

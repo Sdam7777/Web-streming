@@ -1,7 +1,8 @@
 export default async function handler(req, res) {
-  // Enable CORS
+  // Enable CORS and Caching headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=300');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();

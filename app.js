@@ -88,13 +88,22 @@ function openAnimeDetail(id) {
   const container = document.getElementById("episodesCategoryContainer");
   container.innerHTML = "";
 
-  selectedAnime.categories.forEach(cat => {
+  selectedAnime.categories.forEach((cat, index) => {
     const sec = document.createElement("div");
     sec.className = "episodes-category-group";
 
-    const header = document.createElement("h3");
-    header.className = "category-title";
-    header.innerHTML = `<i class="fa-solid ${cat.icon} text-orange"></i> ${cat.name}`;
+    const header = document.createElement("div");
+    header.className = "category-header";
+    header.innerHTML = `
+      <span><i class="fa-solid ${cat.icon} text-orange" style="margin-right: 8px;"></i> ${cat.name}</span>
+      <i class="fa-solid fa-chevron-down chevron-icon"></i>
+    `;
+
+    // Collapsible toggle handler
+    header.onclick = () => {
+      sec.classList.toggle("collapsed");
+    };
+
     sec.appendChild(header);
 
     const epGrid = document.createElement("div");
@@ -193,10 +202,20 @@ function setupAutoResume() {
 
 async function fetchEpisodeViews(epName) {
   const viewText = document.getElementById("viewCountText");
+  const cacheKey = `tariaki_view_${epName}`;
+  const cachedViews = sessionStorage.getItem(cacheKey);
+
+  if (cachedViews) {
+    viewText.textContent = cachedViews;
+    return;
+  }
+
   try {
     const res = await fetch(`/api/views?episode=${encodeURIComponent(epName)}`);
     const data = await res.json();
-    viewText.textContent = data.views || "1";
+    const count = data.views || "1";
+    viewText.textContent = count;
+    sessionStorage.setItem(cacheKey, count);
   } catch (e) {
     viewText.textContent = "1";
   }

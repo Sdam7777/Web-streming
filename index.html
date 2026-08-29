@@ -35,6 +35,36 @@
         </div>
     </header>
 
+    <!-- Login Gate - wajib login Google -->
+    <div id="loginGate" class="login-gate">
+        <div class="login-gate-card">
+            <div class="logo-icon" style="width:48px;height:48px;font-size:18px;margin:0 auto 12px"><i class="fa-solid fa-play"></i></div>
+            <h2 style="font-weight:800;margin-bottom:6px">Wajib Login</h2>
+            <p style="color:var(--text-muted);font-size:14px">Masuk dengan Google untuk nonton Tariaki</p>
+            <button id="gateLoginBtn" class="btn-login" style="margin-top:16px;justify-content:center;width:100%"><i class="fa-brands fa-google"></i> Masuk dengan Google</button>
+        </div>
+    </div>
+
+    <!-- Profile Setup Modal - kustomisasi awal -->
+    <div id="profileSetupModal" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width:480px;width:95%">
+            <div class="modal-header" style="margin-bottom:8px"><i class="fa-solid fa-user-pen text-orange modal-icon"></i><h3>Kustomisasi Profil</h3></div>
+            <p class="modal-body" style="margin-bottom:12px">Bikin profil wibu lu — pp bisa <b>video bergerak</b> + bio!</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+                <label style="font-size:13px;font-weight:600">Nama<input id="profileName" type="text" placeholder="Nama wibu" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></label>
+                <label style="font-size:13px;font-weight:600">Bio<textarea id="profileBio" placeholder="Bio singkat wibu..." rows="3" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></textarea></label>
+                <label style="font-size:13px;font-weight:600">PP Video/Gambar (mp4, webm, jpg, png)<input id="profileAvatar" type="file" accept="image/*,video/*" style="margin-top:6px;width:100%;font-size:12px"></label>
+                <div id="avatarPreview" style="width:96px;height:96px;border-radius:50%;overflow:hidden;border:2px solid var(--primary-orange);display:none;margin:0 auto;background:#000">
+                    <img id="previewImg" style="width:100%;height:100%;object-fit:cover;display:none">
+                    <video id="previewVideo" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:none"></video>
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top:16px">
+                <button id="saveProfileBtn" class="btn-modal-confirm" style="width:100%;justify-content:center">Simpan Profil <i class="fa-solid fa-check"></i></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Container -->
     <main class="main-content">
         <!-- 1. CATALOG DASHBOARD VIEW -->
@@ -164,10 +194,11 @@
     <script src="animeData.js"></script>
     <!-- Application Logic -->
     <script src="app.js"></script>
-    <!-- Firebase Google Auth -->
+    <!-- Firebase Google Auth + Gate + Profile Wibu Video PP -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
         const firebaseConfig = {
             apiKey: "AIzaSyB37kvN0_oyASUJFWmq_N9IZFKD6MHSq1g",
             authDomain: "tariaki.firebaseapp.com",
@@ -176,33 +207,136 @@
             messagingSenderId: "668286766956",
             appId: "1:668286766956:web:085eb028459e69f222ad49"
         };
+        const SUPABASE_URL = "https://lwxoafywdcxaantcixcu.supabase.co";
+        const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3eG9hZnl3ZGN4YWFudGNpeGN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwMDMwODEsImV4cCI6MjEwMzU3OTA4MX0.gDXLbkROBOoYUCb_ZwOBscteT9-VQsg0kDYpOPHuZTk";
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const storage = getStorage(app);
         const provider = new GoogleAuthProvider();
         const loginBtn = document.getElementById('loginBtn');
+        const gateLoginBtn = document.getElementById('gateLoginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const userBox = document.getElementById('userBox');
         const userName = document.getElementById('userName');
         const userPhoto = document.getElementById('userPhoto');
-        loginBtn.onclick = async () => {
-            try { await signInWithPopup(auth, provider); } catch(e){ alert('Login gagal: '+e.message); }
-        };
+        const loginGate = document.getElementById('loginGate');
+        const profileModal = document.getElementById('profileSetupModal');
+        const profileName = document.getElementById('profileName');
+        const profileBio = document.getElementById('profileBio');
+        const profileAvatar = document.getElementById('profileAvatar');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const previewImg = document.getElementById('previewImg');
+        const previewVideo = document.getElementById('previewVideo');
+        const saveBtn = document.getElementById('saveProfileBtn');
+        let currentUser = null;
+        let pendingAvatarFile = null;
+
+        async function doLogin(){ try{ await signInWithPopup(auth, provider);}catch(e){alert('Login gagal: '+e.message);} }
+        loginBtn.onclick = doLogin;
+        if(gateLoginBtn) gateLoginBtn.onclick = doLogin;
         logoutBtn.onclick = () => signOut(auth);
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loginBtn.style.display='none';
-                userBox.style.display='flex';
-                userBox.classList.remove('hidden');
-                userName.textContent = user.displayName || user.email;
-                userPhoto.src = user.photoURL || 'poster.svg';
-                localStorage.setItem('tariaki_user', JSON.stringify({uid:user.uid, email:user.email, name:user.displayName}));
+
+        profileAvatar.onchange = () => {
+            const f = profileAvatar.files[0];
+            pendingAvatarFile = f || null;
+            if(!f){ avatarPreview.style.display='none'; return; }
+            avatarPreview.style.display='block';
+            const isVideo = f.type.startsWith('video/');
+            if(isVideo){
+                previewImg.style.display='none';
+                previewVideo.style.display='block';
+                previewVideo.src = URL.createObjectURL(f);
             } else {
+                previewVideo.style.display='none';
+                previewImg.style.display='block';
+                previewImg.src = URL.createObjectURL(f);
+            }
+        };
+
+        async function fetchProfile(uid){
+            try{
+                const r = await fetch(`${SUPABASE_URL}/rest/v1/profiles?uid=eq.${uid}&select=*`, { headers:{ apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`}});
+                const j = await r.json();
+                return j[0] || null;
+            }catch(e){ return null; }
+        }
+        async function saveProfile(){
+            if(!currentUser) return;
+            const name = profileName.value.trim() || currentUser.displayName || 'Wibu';
+            const bio = profileBio.value.trim() || '';
+            saveBtn.textContent='Menyimpan...'; saveBtn.disabled=true;
+            let avatar_url = currentUser.photoURL || '';
+            let avatar_type = 'image';
+            if(pendingAvatarFile){
+                const ext = pendingAvatarFile.name.split('.').pop();
+                const isVideo = pendingAvatarFile.type.startsWith('video/');
+                avatar_type = isVideo ? 'video' : 'image';
+                const storageRef = ref(storage, `avatars/${currentUser.uid}.${ext}`);
+                await uploadBytes(storageRef, pendingAvatarFile);
+                avatar_url = await getDownloadURL(storageRef);
+            }
+            const payload = { uid: currentUser.uid, email: currentUser.email, display_name: name, bio, avatar_url, avatar_type };
+            await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+                method:'POST',
+                headers:{ apikey:SUPABASE_ANON, Authorization:`Bearer ${SUPABASE_ANON}`, 'Content-Type':'application/json', Prefer:'resolution=merge-duplicates' },
+                body: JSON.stringify(payload)
+            });
+            localStorage.setItem('tariaki_profile', JSON.stringify(payload));
+            profileModal.classList.add('hidden');
+            applyProfileToUI(payload);
+            saveBtn.textContent='Simpan Profil'; saveBtn.disabled=false;
+        }
+        saveBtn.onclick = saveProfile;
+
+        function applyProfileToUI(p){
+            userName.textContent = p.display_name || currentUser.displayName;
+            if(p.avatar_type==='video' && p.avatar_url){
+                userPhoto.style.display='none';
+                let v = document.getElementById('userVideo');
+                if(!v){
+                    v = document.createElement('video');
+                    v.id='userVideo'; v.autoplay=true; v.muted=true; v.loop=true; v.playsInline=true;
+                    v.className='user-photo'; v.style.objectFit='cover';
+                    userPhoto.parentNode.insertBefore(v, userPhoto);
+                }
+                v.src = p.avatar_url; v.style.display='block';
+            } else {
+                let v=document.getElementById('userVideo'); if(v) v.style.display='none';
+                userPhoto.style.display='block';
+                userPhoto.src = p.avatar_url || currentUser.photoURL || 'poster.svg';
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if(!user){
+                currentUser=null;
                 loginBtn.style.display='inline-flex';
                 userBox.style.display='none';
                 userBox.classList.add('hidden');
+                loginGate.style.display='flex';
+                document.querySelector('.main-content').style.display='none';
                 localStorage.removeItem('tariaki_user');
+                return;
+            }
+            currentUser=user;
+            loginBtn.style.display='none';
+            userBox.style.display='flex';
+            userBox.classList.remove('hidden');
+            loginGate.style.display='none';
+            document.querySelector('.main-content').style.display='block';
+            localStorage.setItem('tariaki_user', JSON.stringify({uid:user.uid, email:user.email, name:user.displayName}));
+            const profile = await fetchProfile(user.uid);
+            if(!profile){
+                profileName.value = user.displayName || '';
+                profileBio.value = '';
+                profileModal.classList.remove('hidden');
+            } else {
+                localStorage.setItem('tariaki_profile', JSON.stringify(profile));
+                applyProfileToUI(profile);
             }
         });
+        // Click logo to edit profile again
+        document.getElementById('userBox').onclick = (e)=>{ if(e.target.id!=='logoutBtn' && !e.target.closest('#logoutBtn')){ profileModal.classList.remove('hidden'); } };
         window.firebaseAuth = auth;
     </script>
 </body>

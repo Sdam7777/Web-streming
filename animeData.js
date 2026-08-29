@@ -44,23 +44,28 @@ let catalog = [
 ];
 
 async function loadCatalogFromDB(){
-  const cached = sessionStorage.getItem('tariaki_catalog');
+  const cached = sessionStorage.getItem('tariaki_catalog_v2');
   if(cached){
-    try{ catalog = JSON.parse(cached); if(typeof renderCatalog==='function') renderCatalog(); updateCatalogCount(); return; }catch(e){}
+    try{ const parsed=JSON.parse(cached); if(Array.isArray(parsed) && parsed.length>=3){ catalog = parsed; if(typeof renderCatalog==='function') renderCatalog(); updateCatalogCount(); return; } }catch(e){}
   }
   try{
     const r = await fetch(`${SUPABASE_URL_CATALOG}/rest/v1/anime?select=id,title,poster,mal_image,type,status,total_ep,synopsis,score,members,rank&order=created_at.desc&limit=20`, { headers:{ apikey: SUPABASE_ANON_CATALOG, Authorization: `Bearer ${SUPABASE_ANON_CATALOG}` }});
     const animes = await r.json();
-    if(!Array.isArray(animes) || animes.length===0) return;
+    if(!Array.isArray(animes) || animes.length===0) {
+      // fallback hardcode 3 tetap
+      if(typeof renderCatalog==='function') renderCatalog();
+      updateCatalogCount();
+      return;
+    }
     catalog = animes.map(a=>({
       id:a.id, title:a.title, poster:a.mal_image||a.poster, mal_image:a.mal_image, type:a.type, status:a.status, totalEp:a.total_ep, synopsis:a.synopsis,
       score:a.score, members:a.members, rank:a.rank,
-      categories: [] // lazy
+      categories: [] // lazy hemat kuota
     }));
-    sessionStorage.setItem('tariaki_catalog', JSON.stringify(catalog));
+    sessionStorage.setItem('tariaki_catalog_v2', JSON.stringify(catalog));
     if(typeof renderCatalog==='function') renderCatalog();
     updateCatalogCount();
-  }catch(e){ console.log('catalog DB fail',e); }
+  }catch(e){ console.log('catalog DB fail',e); if(typeof renderCatalog==='function') renderCatalog(); updateCatalogCount(); }
 }
 function updateCatalogCount(){ const cnt=document.querySelector('.catalog-count'); if(cnt) cnt.textContent=`${catalog.length} Anime`; }
 
@@ -81,4 +86,5 @@ async function loadEpisodesForAnime(animeId){
     if(ova.length) item.categories.push({ name:'Uncensored', typeKey:'OVA', icon:'fa-eye', episodes: ova });
   }catch(e){ console.log('episodes load fail',e); }
 }
-loadCatalogFromDB();
+// jangan auto call di sini - biar app.js yang panggil setelah renderCatalog siap, cegah race
+// loadCatalogFromDB() akan dipanggil dari app.js DOMContentLoaded

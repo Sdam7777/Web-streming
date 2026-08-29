@@ -84,6 +84,7 @@ function openAnimeDetail(id) {
   switchView("detailView");
 }
 
+function getEpisodeUrls(ep){ return ep.urls && Array.isArray(ep.urls) && ep.urls.length ? ep.urls : [ep.url]; }
 function playEpisode(ep) {
   selectedEpisode = ep;
   const player = document.getElementById("videoPlayer");
@@ -91,8 +92,13 @@ function playEpisode(ep) {
   const titleEl = document.getElementById("currentEpisodeTitle");
   const sizeBadge = document.getElementById("sizeBadge");
   const downloadBtn = document.getElementById("downloadBtn");
-  source.src = ep.url;
+  const urls = getEpisodeUrls(ep);
+  let urlIdx = 0;
+  source.src = urls[urlIdx];
   player.load();
+  player.onerror = () => {
+    if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); player.play().catch(()=>{}); }
+  };
   const savedTime = localStorage.getItem(`tariaki_progress_${ep.name}`);
   if (savedTime) {
     player.addEventListener('loadedmetadata', () => { player.currentTime = parseFloat(savedTime); }, { once: true });

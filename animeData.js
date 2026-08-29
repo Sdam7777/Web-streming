@@ -8,7 +8,7 @@ let catalog = [
   {
     id: "prison-school",
     title: "Prison School (Uncensored - Sub Indo)",
-    poster: "cover.jpg",
+    poster: "cover.webp",
     mal_image: "https://cdn.myanimelist.net/images/anime/12/76064l.jpg",
     type: "TV Series + OVA [Uncensored]",
     status: "Completed",

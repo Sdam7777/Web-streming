@@ -57,7 +57,7 @@
             <div class="modal-header" style="margin-bottom:8px"><i class="fa-solid fa-user-pen text-orange modal-icon"></i><h3>Kustomisasi Profil</h3></div>
             <p class="modal-body" style="margin-bottom:12px">Atur nama, bio, pp & banner — pp otomatis deteksi foto/video.</p>
             <div style="display:flex;flex-direction:column;gap:14px">
-                <label style="font-size:13px;font-weight:600">Nama<input id="profileName" type="text" placeholder="Nama wibu" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></label>
+                <label style="font-size:13px;font-weight:600">Nama<input id="profileName" type="text" placeholder="Nama" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></label>
                 <label style="font-size:13px;font-weight:600">Bio<textarea id="profileBio" placeholder="Bio singkat wibu..." rows="3" style="margin-top:6px;width:100%;padding:10px;border-radius:8px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-main)"></textarea></label>
                 <label style="font-size:13px;font-weight:600">PP Foto/Video (auto)<input id="profileAvatar" type="file" accept="image/*,video/*" style="margin-top:6px;width:100%;font-size:12px"></label>
                 <div id="avatarPreview" style="width:96px;height:96px;border-radius:50%;overflow:hidden;border:2px solid var(--primary-orange);display:none;margin:0 auto;background:#000">
@@ -448,7 +448,7 @@
                 userBox.style.display='none';
                 userBox.classList.add('hidden');
                 loginGate.style.display='flex';
-                if(main) main.style.display='none';
+                if(main){ main.style.display='none'; main.classList.remove('auth-ready'); }
                 document.body.style.overflow='hidden';
                 localStorage.removeItem('tariaki_user');
                 return;
@@ -458,14 +458,27 @@
             userBox.style.display='flex';
             userBox.classList.remove('hidden');
             loginGate.style.display='none';
-            if(main) main.style.display='block';
+            if(main){ main.style.display='block'; main.classList.add('auth-ready'); }
             document.body.style.overflow='';
             localStorage.setItem('tariaki_user', JSON.stringify({uid:user.uid, email:user.email, name:user.displayName}));
+            // cek cache dulu biar gak kedip modal tiap reload
+            const cached = JSON.parse(localStorage.getItem('tariaki_profile')||'null');
+            if(cached && cached.display_name){
+                applyProfileToUI(cached);
+                return;
+            }
             const profile = await fetchProfile(user.uid);
-            if(!profile){
+            if(!profile || !profile.display_name){
                 profileName.value = user.displayName || '';
-                profileBio.value = '';
-                profileModal.classList.remove('hidden');
+                profileBio.value = profile?.bio || '';
+                // jangan paksa kalo udah pernah isi bio/avatar
+                const hasBio = profile && profile.bio;
+                const hasAvatar = profile && profile.avatar_url;
+                if(!hasBio && !hasAvatar){
+                    profileModal.classList.remove('hidden');
+                } else {
+                    if(profile) { localStorage.setItem('tariaki_profile', JSON.stringify(profile)); applyProfileToUI(profile); }
+                }
             } else {
                 localStorage.setItem('tariaki_profile', JSON.stringify(profile));
                 applyProfileToUI(profile);

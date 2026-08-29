@@ -7,20 +7,32 @@ const catalog = [
     status: "Completed",
     totalEp: 13,
     synopsis: "Hachimitsu Private Academy, institusi boarding school putri berasrama paling bergengsi di Tokyo, memutuskan untuk mengizinkan murid laki-laki masuk pertama kali dalam sejarah sekolah tersebut. Lima anak laki-laki diterima, tetapi mereka tak sadar akan takdir ekstrem yang menanti mereka di bawah pengawasan ketat Dewan Siswa Bayangan (Underground Student Council).",
-    episodes: [
-      { id: 1, title: "Prison School - Episode 01", name: "Prison_School_01.mkv", size: "113.59 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_01.mkv", isOva: false },
-      { id: 2, title: "Prison School - Episode 02", name: "Prison_School_02.mkv", size: "109.94 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_02.mkv", isOva: false },
-      { id: 3, title: "Prison School - Episode 03", name: "Prison_School_03.mkv", size: "108.78 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_03.mkv", isOva: false },
-      { id: 4, title: "Prison School - Episode 04", name: "Prison_School_04.mkv", size: "110.26 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_04.mkv", isOva: false },
-      { id: 5, title: "Prison School - Episode 05", name: "Prison_School_05.mkv", size: "83.43 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_05.mkv", isOva: false },
-      { id: 6, title: "Prison School - Episode 06", name: "Prison_School_06.mkv", size: "97.43 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_06.mkv", isOva: false },
-      { id: 7, title: "Prison School - Episode 07", name: "Prison_School_07.mkv", size: "108.20 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_07.mkv", isOva: false },
-      { id: 8, title: "Prison School - Episode 08", name: "Prison_School_08.mkv", size: "98.18 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_08.mkv", isOva: false },
-      { id: 9, title: "Prison School - Episode 09", name: "Prison_School_09.mkv", size: "110.35 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_09.mkv", isOva: false },
-      { id: 10, title: "Prison School - Episode 10", name: "Prison_School_10.mkv", size: "104.33 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_10.mkv", isOva: false },
-      { id: 11, title: "Prison School - Episode 11", name: "Prison_School_11.mkv", size: "97.01 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_11.mkv", isOva: false },
-      { id: 12, title: "Prison School - Episode 12 (END)", name: "Prison_School_12_END.mkv", size: "110.16 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_12_END.mkv", isOva: false },
-      { id: 13, title: "Prison School - OVA 1", name: "Prison_School_OVA1.mkv", size: "80.33 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_OVA1.mkv", isOva: true }
+    categories: [
+      {
+        name: "TV Series (12 Episode)",
+        icon: "fa-film",
+        episodes: [
+          { id: 1, title: "Prison School - Episode 01", name: "Prison_School_01.mkv", size: "113.59 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_01.mkv" },
+          { id: 2, title: "Prison School - Episode 02", name: "Prison_School_02.mkv", size: "109.94 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_02.mkv" },
+          { id: 3, title: "Prison School - Episode 03", name: "Prison_School_03.mkv", size: "108.78 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_03.mkv" },
+          { id: 4, title: "Prison School - Episode 04", name: "Prison_School_04.mkv", size: "110.26 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_04.mkv" },
+          { id: 5, title: "Prison School - Episode 05", name: "Prison_School_05.mkv", size: "83.43 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_05.mkv" },
+          { id: 6, title: "Prison School - Episode 06", name: "Prison_School_06.mkv", size: "97.43 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_06.mkv" },
+          { id: 7, title: "Prison School - Episode 07", name: "Prison_School_07.mkv", size: "108.20 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_07.mkv" },
+          { id: 8, title: "Prison School - Episode 08", name: "Prison_School_08.mkv", size: "98.18 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_08.mkv" },
+          { id: 9, title: "Prison School - Episode 09", name: "Prison_School_09.mkv", size: "110.35 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_09.mkv" },
+          { id: 10, title: "Prison School - Episode 10", name: "Prison_School_10.mkv", size: "104.33 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_10.mkv" },
+          { id: 11, title: "Prison School - Episode 11", name: "Prison_School_11.mkv", size: "97.01 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_11.mkv" },
+          { id: 12, title: "Prison School - Episode 12 (END)", name: "Prison_School_12_END.mkv", size: "110.16 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_12_END.mkv" }
+        ]
+      },
+      {
+        name: "OVA (Original Video Animation)",
+        icon: "fa-star",
+        episodes: [
+          { id: 13, title: "Prison School - OVA 1", name: "Prison_School_OVA1.mkv", size: "80.33 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Prison_School_OVA1.mkv" }
+        ]
+      }
     ]
   }
 ];
@@ -73,20 +85,36 @@ function openAnimeDetail(id) {
   document.getElementById("animeEpCount").textContent = `${selectedAnime.totalEp} Episode`;
   document.getElementById("animeSynopsis").textContent = selectedAnime.synopsis;
 
-  const epGrid = document.getElementById("episodesGrid");
-  epGrid.innerHTML = "";
+  const container = document.getElementById("episodesCategoryContainer");
+  container.innerHTML = "";
 
-  selectedAnime.episodes.forEach(ep => {
-    const btn = document.createElement("div");
-    btn.className = "ep-button";
-    btn.onclick = () => playEpisode(ep);
-    btn.innerHTML = `
-      <div class="ep-name">
-        <i class="fa-solid fa-play text-orange" style="margin-right: 8px;"></i> ${ep.title}
-      </div>
-      <div class="ep-size">${ep.size}</div>
-    `;
-    epGrid.appendChild(btn);
+  selectedAnime.categories.forEach(cat => {
+    const sec = document.createElement("div");
+    sec.className = "episodes-category-group";
+
+    const header = document.createElement("h3");
+    header.className = "category-title";
+    header.innerHTML = `<i class="fa-solid ${cat.icon} text-orange"></i> ${cat.name}`;
+    sec.appendChild(header);
+
+    const epGrid = document.createElement("div");
+    epGrid.className = "episodes-grid";
+
+    cat.episodes.forEach(ep => {
+      const btn = document.createElement("div");
+      btn.className = "ep-button";
+      btn.onclick = () => playEpisode(ep);
+      btn.innerHTML = `
+        <div class="ep-name">
+          <i class="fa-solid fa-play text-orange" style="margin-right: 8px;"></i> ${ep.title}
+        </div>
+        <div class="ep-size">${ep.size}</div>
+      `;
+      epGrid.appendChild(btn);
+    });
+
+    sec.appendChild(epGrid);
+    container.appendChild(sec);
   });
 
   switchView("detailView");

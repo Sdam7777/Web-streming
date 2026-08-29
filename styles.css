@@ -324,10 +324,20 @@ body {
 }
 
 /* Episodes Grid */
-.episodes-section h3 {
-    font-size: 18px;
+.episodes-category-group {
+    margin-bottom: 24px;
+}
+
+.category-title {
+    font-size: 17px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
 }
 
 .episodes-grid {

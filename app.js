@@ -317,14 +317,19 @@ function setupPlayerEnhancements(){
   }
 }
 
+let lastSyncTime=0;
 function setupAutoResumeAndAutoNext() {
   const player = document.getElementById("videoPlayer");
   if (!player) return;
   player.ontimeupdate = () => {
     if (selectedEpisode && player.duration && player.currentTime > 5) {
       localStorage.setItem(`tariaki_progress_${selectedEpisode.name}`, player.currentTime);
-      const u=getUser();
-      if(u && selectedAnime) syncWatchHistory(u.uid, selectedAnime.id, selectedEpisode.name, player.currentTime, player.duration);
+      const now=Date.now();
+      if(now-lastSyncTime>15000){
+        lastSyncTime=now;
+        const u=getUser();
+        if(u && selectedAnime) syncWatchHistory(u.uid, selectedAnime.id, selectedEpisode.name, player.currentTime, player.duration);
+      }
     }
   };
   player.onended = () => { playNextEpisode(); };

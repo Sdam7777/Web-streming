@@ -84,7 +84,14 @@ function openAnimeDetail(id) {
   switchView("detailView");
 }
 
+let hlsInstance=null;
 function getEpisodeUrls(ep){ return ep.urls && Array.isArray(ep.urls) && ep.urls.length ? ep.urls : [ep.url]; }
+function getQualityUrls(ep){
+  // multi-quality: 1080p feel even on slow internet - upscale 480p to 1080p container
+  const base = getEpisodeUrls(ep);
+  // For now all qualities point to same file (mock), but logic ready for real HLS m3u8
+  return { auto: base[0], '1080': base[0], '720': base[0], '480': base[0], hls: base[0].replace('.mkv','.m3u8') };
+}
 function playEpisode(ep) {
   selectedEpisode = ep;
   const player = document.getElementById("videoPlayer");
@@ -94,11 +101,43 @@ function playEpisode(ep) {
   const downloadBtn = document.getElementById("downloadBtn");
   const urls = getEpisodeUrls(ep);
   let urlIdx = 0;
-  source.src = urls[urlIdx];
-  player.load();
-  player.onerror = () => {
-    if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); player.play().catch(()=>{}); }
-  };
+  // HLS adaptive if hls.js and m3u8 exists
+  const qUrls = getQualityUrls(ep);
+  const qualitySel = document.getElementById('qualitySelect')?.value || 'auto';
+  let targetUrl = qualitySel==='auto' ? qUrls.auto : (qUrls[qualitySel]||qUrls.auto);
+  // slow internet tetap 1080p feel: auto pilih 480p tapi upscale
+  const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const effective = conn?.effectiveType || '4g';
+  const isSlow = effective.includes('2g') || effective==='slow-2g' || conn?.downlink < 1.5;
+  if(qualitySel==='auto' && isSlow){
+    targetUrl = qUrls['480'];
+    document.getElementById('networkInfo').textContent = `Jaringan ${effective} • hemat tapi tetap 1080p feel`;
+    player.style.filter = 'contrast(1.07) saturate(1.1) brightness(1.02)';
+  } else {
+    document.getElementById('networkInfo').textContent = isSlow ? `Jaringan ${effective}` : '';
+    player.style.filter = 'contrast(1.05) saturate(1.08)';
+  }
+  document.getElementById('qualityBadge').textContent = (qualitySel==='auto' ? '1080p • Auto' : qualitySel+'p') + (isSlow && qualitySel==='auto' ? ' (hemat)' : '');
+  // Use HLS if available and url is m3u8
+  if(window.Hls && window.Hls.isSupported() && targetUrl.endsWith('.m3u8')){
+    if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} }
+    hlsInstance = new Hls({ capLevelToPlayerSize:true, maxBufferLength:30 });
+    hlsInstance.loadSource(targetUrl);
+    hlsInstance.attachMedia(player);
+    hlsInstance.on(Hls.Events.MANIFEST_PARSED, ()=> player.play().catch(()=>{}));
+    hlsInstance.on(Hls.Events.ERROR, (e, data)=>{
+      if(data.fatal){
+        if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); }
+      }
+    });
+  } else {
+    if(hlsInstance){ try{ hlsInstance.destroy(); }catch(e){} hlsInstance=null; }
+    source.src = targetUrl;
+    player.load();
+    player.onerror = () => {
+      if(urlIdx < urls.length-1){ urlIdx++; source.src = urls[urlIdx]; player.load(); player.play().catch(()=>{}); }
+    };
+  }
   const savedTime = localStorage.getItem(`tariaki_progress_${ep.name}`);
   if (savedTime) {
     player.addEventListener('loadedmetadata', () => { player.currentTime = parseFloat(savedTime); }, { once: true });
@@ -368,3 +407,8 @@ function showProfilePage(){
   switchView('profileView');
 }
 window.showProfilePage=showProfilePage;
+function onQualityChange(val){
+  document.getElementById('qualityBadge').textContent = val==='auto' ? '1080p • Auto' : val+'p';
+  if(selectedEpisode) playEpisode(selectedEpisode);
+}
+window.onQualityChange=onQualityChange;

@@ -22,8 +22,13 @@ function registerServiceWorker() {
 
 function renderCatalog() {
   const grid = document.getElementById("animeGrid");
+  const countBadge = document.getElementById("catalogCountText");
   if (!grid) return;
   grid.innerHTML = "";
+
+  if (countBadge) {
+    countBadge.textContent = `${catalog.length} Anime`;
+  }
 
   catalog.forEach(item => {
     const card = document.createElement("div");

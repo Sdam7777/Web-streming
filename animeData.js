@@ -61,5 +61,35 @@ const catalog = [
         ]
       }
     ]
+  },
+  {
+    id: "mato-seihei-slave",
+    title: "Mato Seihei no Slave (Sub Indo)",
+    poster: "https://upload.wikimedia.org/wikipedia/en/thumb/8/8b/Chained_Soldier_volume_1_cover.jpg/220px-Chained_Soldier_volume_1_cover.jpg",
+    type: "TV Series",
+    status: "Completed",
+    totalEp: 12,
+    synopsis: "Ketika gerbang ke dimensi penuh monster bernama 'Mato' terbuka di seluruh Jepang, manusia menemukan buah misterius 'Peach' yang memberikan kekuatan super khusus kepada para wanita. Yuuki Wakura, seorang siswa SMA biasa, terjebak dalam serangan monster Shuuki sebelum diselamatkan oleh Kyouka Uzen, kapten Unit ke-7 Pasukan Penanggulangan Iblis. Demi bertahan hidup, Yuuki setuju menjadi 'budak' (slave) Kyouka yang membangkitkan wujud bertarung luar biasa.",
+    categories: [
+      {
+        name: "TV Series (12 Episode)",
+        typeKey: "TV",
+        icon: "fa-film",
+        episodes: [
+          { id: 1, title: "Mato Seihei no Slave - Episode 01", name: "Mato_Seihei_no_Slave_01.mkv", size: "115.20 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_01.mkv" },
+          { id: 2, title: "Mato Seihei no Slave - Episode 02", name: "Mato_Seihei_no_Slave_02.mkv", size: "112.50 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_02.mkv" },
+          { id: 3, title: "Mato Seihei no Slave - Episode 03", name: "Mato_Seihei_no_Slave_03.mkv", size: "110.80 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_03.mkv" },
+          { id: 4, title: "Mato Seihei no Slave - Episode 04", name: "Mato_Seihei_no_Slave_04.mkv", size: "114.10 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_04.mkv" },
+          { id: 5, title: "Mato Seihei no Slave - Episode 05", name: "Mato_Seihei_no_Slave_05.mkv", size: "109.40 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_05.mkv" },
+          { id: 6, title: "Mato Seihei no Slave - Episode 06", name: "Mato_Seihei_no_Slave_06.mkv", size: "118.60 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_06.mkv" },
+          { id: 7, title: "Mato Seihei no Slave - Episode 07", name: "Mato_Seihei_no_Slave_07.mkv", size: "113.70 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_07.mkv" },
+          { id: 8, title: "Mato Seihei no Slave - Episode 08", name: "Mato_Seihei_no_Slave_08.mkv", size: "111.90 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_08.mkv" },
+          { id: 9, title: "Mato Seihei no Slave - Episode 09", name: "Mato_Seihei_no_Slave_09.mkv", size: "116.30 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_09.mkv" },
+          { id: 10, title: "Mato Seihei no Slave - Episode 10", name: "Mato_Seihei_no_Slave_10.mkv", size: "108.80 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_10.mkv" },
+          { id: 11, title: "Mato Seihei no Slave - Episode 11", name: "Mato_Seihei_no_Slave_11.mkv", size: "112.10 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_11.mkv" },
+          { id: 12, title: "Mato Seihei no Slave - Episode 12 (END)", name: "Mato_Seihei_no_Slave_12_END.mkv", size: "117.50 MB", url: "https://github.com/Sdam7777/Web-streming/releases/download/v1.0.0/Mato_Seihei_no_Slave_12_END.mkv" }
+        ]
+      }
+    ]
   }
 ];

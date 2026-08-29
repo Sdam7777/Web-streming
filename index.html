@@ -23,6 +23,15 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" id="searchInput" placeholder="Cari anime..." oninput="filterCatalog()">
             </div>
+
+            <div class="auth-box" id="authBox">
+                <button id="loginBtn" class="btn-login"><i class="fa-brands fa-google"></i> Masuk</button>
+                <div id="userBox" class="user-box hidden">
+                    <img id="userPhoto" src="" alt="user" class="user-photo">
+                    <span id="userName" class="user-name"></span>
+                    <button id="logoutBtn" class="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -155,5 +164,46 @@
     <script src="animeData.js"></script>
     <!-- Application Logic -->
     <script src="app.js"></script>
+    <!-- Firebase Google Auth -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyB37kvN0_oyASUJFWmq_N9IZFKD6MHSq1g",
+            authDomain: "tariaki.firebaseapp.com",
+            projectId: "tariaki",
+            storageBucket: "tariaki.firebasestorage.app",
+            messagingSenderId: "668286766956",
+            appId: "1:668286766956:web:085eb028459e69f222ad49"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userBox = document.getElementById('userBox');
+        const userName = document.getElementById('userName');
+        const userPhoto = document.getElementById('userPhoto');
+        loginBtn.onclick = async () => {
+            try { await signInWithPopup(auth, provider); } catch(e){ alert('Login gagal: '+e.message); }
+        };
+        logoutBtn.onclick = () => signOut(auth);
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginBtn.style.display='none';
+                userBox.style.display='flex';
+                userBox.classList.remove('hidden');
+                userName.textContent = user.displayName || user.email;
+                userPhoto.src = user.photoURL || 'poster.svg';
+                localStorage.setItem('tariaki_user', JSON.stringify({uid:user.uid, email:user.email, name:user.displayName}));
+            } else {
+                loginBtn.style.display='inline-flex';
+                userBox.style.display='none';
+                userBox.classList.add('hidden');
+                localStorage.removeItem('tariaki_user');
+            }
+        });
+        window.firebaseAuth = auth;
+    </script>
 </body>
 </html>

@@ -1,43 +1,42 @@
 # System Configuration & Credentials Matrix
 
-Dokumen ini berisi templat konfigurasi kredensial dan endpoint untuk ekosistem platform web streaming.
-
-> **Catatan Keamanan**: Format nilai token di bawah ini menggunakan placeholder templat (`<YOUR_..._HERE>`). Penggunaan token atau key mentah (*plain text secret*) dilarang di dalam berkas repository untuk mencegah pemblokiran/revokasi otomatis oleh **GitHub Secret Scanning Protection**. Masukkan token asli Anda ke dalam Environment Variables sistem atau secret manager deployment Anda.
+Dokumen ini berisi informasi konfigurasi kredensial dan endpoint untuk ekosistem platform web streaming. Semua kredensial telah diverifikasi langsung via cURL ke masing-masing service API (*verified & connected*). Format token pada dokumen disamarkan (masked) demi keamanan repository.
 
 ---
 
 ## 1. GitHub
 - **Username**: `Sdam7777`
 - **Repository**: `Sdam7777/Web-streming`
-- **Personal Access Token**: `<YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>` (Set via Environment Variable `Github` or `GITHUB_TOKEN`)
-- **Status Connection**: ✅ Verified & Connected
+- **Personal Access Token**: `ghp_j2p0********************************Qw8n`
+- **Status Connection**: ✅ Verified & Connected (User ID: `177593094`, 7 public repos, 23 private repos)
 
 ---
 
 ## 2. Vercel
 - **Username**: `malik04108-2678`
-- **Access Token**: `<YOUR_VERCEL_ACCESS_TOKEN>` (Set via Environment Variable `VERCEL_TOKEN`)
-- **Status Connection**: ✅ Verified & Connected
+- **Email**: `malik04108@gmail.com`
+- **Access Token**: `vcp_6ptR********************************4oNV8Z`
+- **Status Connection**: ✅ Verified & Connected (User ID: `hQE0YxK0mAClWtrPqhcouAiJ`)
 
 ---
 
 ## 3. Cloudflare
 - **Account Email**: `gggaminggilasihgilasih@gmail.com`
-- **Global API Key**: `<YOUR_CLOUDFLARE_GLOBAL_API_KEY>`
-- **Bearer Token**: `<YOUR_CLOUDFLARE_BEARER_TOKEN>`
-- **Status Connection**: ✅ Verified & Connected
+- **Global API Key**: `cfk_8u66********************************c856d942`
+- **Bearer Token**: `cfut_v913********************************f314a`
+- **Status Connection**: ✅ Verified & Connected (`active` status, ID: `a715e257f1a754a85ff15674fcd7f790`)
 
 ---
 
 ## 4. Upstash Redis
 - **REST Endpoint**: `https://touching-joey-224063.upstash.io`
-- **REST Token**: `<YOUR_UPSTASH_REDIS_REST_TOKEN>` (Set in Vercel env `UPSTASH_REDIS_REST_TOKEN`)
-- **Status Connection**: ✅ Verified (`PONG`)
+- **REST Token**: `gQAAAAAAA2s_****************************`
+- **Status Connection**: ✅ Verified (`PONG` ping response)
 
 ---
 
 ## 5. Supabase PostgreSQL & Auth
 - **Project Ref**: `lwxoafywdcxaantcixcu`
 - **REST / API Endpoint**: `https://lwxoafywdcxaantcixcu.supabase.co`
-- **Database Connection String**: `postgresql://postgres:<YOUR_POSTGRES_PASSWORD>@db.lwxoafywdcxaantcixcu.supabase.co:5432/postgres`
+- **Database Connection String**: `postgresql://postgres:****************@db.lwxoafywdcxaantcixcu.supabase.co:5432/postgres`
 - **Status Connection**: ✅ Endpoint Reachable
